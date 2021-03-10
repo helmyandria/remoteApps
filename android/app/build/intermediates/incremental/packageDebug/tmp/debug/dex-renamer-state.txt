@@ -1,0 +1,4 @@
+#Tue Mar 02 09:58:22 WIB 2021
+base.0=/Users/eko.asputro/Documents/React Projects/remoteApps/android/app/build/intermediates/dex/debug/mergeDexDebug/classes.dex
+path.0=classes.dex
+renamed.0=classes.dex
