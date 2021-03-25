@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { StyleSheet, StatusBar, Text, TouchableOpacity, View } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -7,6 +7,8 @@ import LaporanTagihan from '../LaporanTagihan';
 import InputNoMeter from '../InputNoMeter';
 import TambahTagihan from '../TambahTagihan';
 import Tes from '../Tes';
+import { useEffect } from 'react/cjs/react.development';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Stack = createStackNavigator();
 
@@ -31,6 +33,27 @@ function MenuListrik() {
   );
 
 const MenuListrikScreen = ({navigation}) => {
+    const [shouldShow, setShouldShow] = useState(false);
+
+    useEffect(() => {
+        AsyncStorage.getItem('user')
+        .then((value) => {
+          const roleuser = value ? JSON.parse(value) : [];
+          console.log(`role user : ${roleuser[0].role}`);
+        //   hide menu tambah tagihan if role == pelanggan
+        if (roleuser[0].role == 'pelanggan'){
+            console.log('role = pelanggan')
+            setShouldShow(false)
+        } else {
+            console.log('role not pelanggan')
+            setShouldShow(true)
+        }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }, []);
+
     return (
         <View style={styles.container}>
                 <MyStatusBar backgroundColor="#1d6ea4" barStyle="light-content" />
@@ -57,20 +80,23 @@ const MenuListrikScreen = ({navigation}) => {
                          <Text style={styles.titleMenu}>Tagihan</Text>
                      </View>
                      </TouchableOpacity>
-                     <TouchableOpacity activeOpacity = { .5 } onPress={() => navigation.navigate('TambahTagihan')}>
-                     <View style={styles.containerContentMenu}>
-                         <MaterialCommunityIcons name='bookmark-plus' size={50} style={styles.iconMenu} />
-                         <Text style={styles.titleMenu}>Tambah</Text>
-                         <Text style={styles.titleMenu}>Tagihan</Text>
-                     </View>
-                     </TouchableOpacity>
-                     <TouchableOpacity activeOpacity = { .5 } onPress={() => navigation.navigate('Tes')}>
+                     {shouldShow ? (
+                        <TouchableOpacity activeOpacity = { .5 } onPress={() => navigation.navigate('TambahTagihan')}>
+                        <View style={styles.containerContentMenu}>
+                            <MaterialCommunityIcons name='bookmark-plus' size={50} style={styles.iconMenu} />
+                            <Text style={styles.titleMenu}>Tambah</Text>
+                            <Text style={styles.titleMenu}>Tagihan</Text>
+                        </View>
+                        </TouchableOpacity>
+                        ) : null
+                     }
+                     {/* <TouchableOpacity activeOpacity = { .5 } onPress={() => navigation.navigate('Tes')}>
                      <View style={styles.containerContentMenu}>
                          <MaterialCommunityIcons name='file-edit' size={50} style={styles.iconMenu} />
                          <Text style={styles.titleMenu}>Tes</Text>
                          <Text style={styles.titleMenu}>Class</Text>
                      </View>
-                     </TouchableOpacity>
+                     </TouchableOpacity> */}
                  </View>
                 </View>
             </View>

@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import { StyleSheet, Text, View, TextInput, Image, TouchableOpacity, Alert, StatusBar} from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler';
 import { color } from 'react-native-reanimated';
@@ -8,6 +8,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import ImagePickerCamera from 'react-native-image-crop-picker';
 import LaporanInputNoMeter from '../LaporanInputNoMeter';
+import { Dropdown } from 'sharingan-rn-modal-dropdown';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const MyStatusBar = ({backgroundColor, ...props}) => (
     <View style={[styles.statusBar, { backgroundColor, height: 24 }]}>
@@ -43,6 +45,53 @@ const InputNoMeterScreen = ({navigation}) => {
     const [image, setImage] = useState('https://www.arsenal.com/sites/default/files/styles/player_featured_image_1045x658/public/images/Tierney_1045x658_0.jpg?itok=mjvpH5MI');
     const [shouldShow, setShouldShow] = useState(false);
     const [containerImageNull, setContainerImageNull] = useState(true);
+    const [namaPT, setNamaPT] = useState();
+    const [alamatPT, setAlamatPT] = useState();
+
+    var nameArray=[
+        {
+            value: '',
+            label: '',
+        },
+    ]
+
+    const onChangeHandler = (value) => {
+        console.log(`installation_code selected : ${value}`);
+        const search = nameArray => nameArray.label === value;
+        console.log(`index on selected : ${nameArray.findIndex(search)-1}`);
+        AsyncStorage.getItem('user')
+        .then((value) => {
+            const findByInstallationCode = value ? JSON.parse(value) : [];
+            console.log(`data pt name : ${findByInstallationCode[nameArray.findIndex(search)-1].customer_name}`)
+            console.log(`data pt address : ${findByInstallationCode[nameArray.findIndex(search)-1].installation_address} `)
+            setNamaPT(findByInstallationCode[nameArray.findIndex(search)-1].customer_name);
+            setAlamatPT(findByInstallationCode[nameArray.findIndex(search)-1].installation_address);
+        })
+        .catch((error) => {
+        console.log(error);
+        });
+    }
+
+    useEffect(() => {
+          AsyncStorage.getItem('user')
+          .then((value) => {
+            const user = value ? JSON.parse(value) : [];
+            console.log(`value data : ${JSON.stringify(user)}`);
+            for (let i=0; i < user.length; i++){
+                console.log(`data loop : ${user[i].installation_code}`)
+                nameArray.push(
+                {
+                    value: `${user[i].installation_code}`,
+                    label: `${user[i].installation_code}`
+                }
+                );
+              }
+
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+    }, []);
 
     return (
         <View style={styles.container}>
@@ -56,14 +105,20 @@ const InputNoMeterScreen = ({navigation}) => {
             <ScrollView>
             <View style={styles.containerMainNoMeter}>
                 <View style={styles.containerInfoUser}>
-                    <Text style={styles.titleH1}>No Installasi</Text>
-                    <Text style={styles.valueText}>L/0210013017/00006</Text>
+                    <Dropdown
+                        label="No Installasi"
+                        data={nameArray}
+                        disableSort
+                        value={nameArray}
+                        // onChange={onChangeSS}
+                        onChange={value => onChangeHandler(value)}
+                    />
                     <View style={styles.divView}/>
                     <Text style={styles.titleH1}>Nama</Text>
-                    <Text style={styles.valueText}>PT BERKAH INDUSTRI MESIN ANGKAT</Text>
+                    <Text style={styles.valueText}>{`${namaPT}`}</Text>
                     <View style={styles.divView}/>
                     <Text style={styles.titleH1}>Alamat</Text>
-                    <Text style={styles.valueText}>JL.PRAPAT KURUNG UTARA 58 RT.002 RW.003 PERAK UTARA</Text>
+                    <Text style={styles.valueText}>{`${alamatPT}`}</Text>
                 </View>
                 <View style={styles.containerInput}>
                     <Text style={styles.titleH1}>KWH Awal</Text>
@@ -110,7 +165,6 @@ const InputNoMeterScreen = ({navigation}) => {
                         style={styles.draftButtonStyle} onPress={
                             () =>
                              {Alert.alert('You tapped button draft');}
-                            // this.FunctionToOpenSecondActivity
                         }>
                     <Text style={styles.titleButtonStyle}> DRAFT </Text>
                     </TouchableOpacity>
@@ -119,7 +173,6 @@ const InputNoMeterScreen = ({navigation}) => {
                             () =>
                             //  {Alert.alert('You tapped button posting');}
                              {navigation.navigate('LaporanInputNoMeter')}
-                            // this.FunctionToOpenSecondActivity
                         }>
                     <Text style={styles.titleButtonStyle}> POSTING </Text>
                     </TouchableOpacity>

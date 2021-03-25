@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "/Users/eko.asputro/Documents/React Projects/remoteApps/android/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values-es-rUS/values-es-rUS.xml",
+            "outputFile": "/Users/eko.asputro/Documents/React Projects/clone 2/remoteApps/android/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values-es-rUS/values-es-rUS.xml",
             "map": [
                 {
                     "source": "/Users/eko.asputro/.gradle/caches/transforms-2/files-2.1/b058cda32d7fc75b0153169eacbd0342/appcompat-1.1.0/res/values-es-rUS/values-es-rUS.xml",

@@ -1,8 +1,9 @@
-import React from 'react';
-import { StyleSheet, Text, TextInput, View, Image, TouchableOpacity, Alert, Button, StatusBar} from 'react-native';
+import React, { Component, useState } from 'react';
+import { StyleSheet, Text, TextInput, View, Image, TouchableOpacity, Alert, Button, StatusBar, ToastAndroid} from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import logoRemote from '../../assets/images/logo-remote.png';
 import logoPelindo from '../../assets/images/logo-pelindo.png';
 import Register from '../Register';
@@ -28,9 +29,149 @@ function Login() {
 
 const Stack = createStackNavigator();
 
+// class LoginScreen extends Component {
+//     constructor(props){
+//         super(props);
+//     }
+
+//     componentDidMount(){
+
+//     }
+
+//     render() {
+//         return (
+//         <View style={styles.container}>
+//             <MyStatusBar backgroundColor="#1d6ea4" barStyle="light-content" />
+//             <View style={styles.containerMainLogin}>
+//                 <View style={styles.containerLogin}>
+//                     <Image source={logoRemote} style={styles.imageStyle}/>
+//                     <View>
+//                         {/* <View style={{flexDirection:'row'}}>
+//                             <MaterialCommunityIcons name="account" size={30} style={styles.iconHeader}/>
+//                             <TextInput style={styles.textInputStyle} placeholder='Masukkan Username'/>
+//                         </View> */}
+//                         <View style={{flexDirection:'row', alignItems:'center', paddingVertical:15, marginTop:20}}>
+//                             <MaterialCommunityIcons name="account" size={30} style={{marginRight:5, color:'#000000', flex:1}}/>
+//                             <TextInput style={styles.textInputStyle} placeholder='Masukkan Username Anda' maxLength={15}
+//                             // onChangeText={text => setUsernameValue(text)} value={usernameValue}
+//                             />
+//                         </View>
+//                         <View style={{flexDirection:'row', alignItems:'center', paddingVertical:15}}>
+//                             <MaterialCommunityIcons name="lock" size={30} style={{marginRight:5, color:'#000000', flex:1}}/>
+//                             <TextInput style={styles.textInputStyle} placeholder='Masukkan Password' maxLength={15} secureTextEntry={true}
+//                             // onChangeText={text => setPassValue(text)} value={passValue}
+//                             />
+//                         </View>
+//                         {/* <Text style={styles.textStyleTitle}>Password</Text>
+//                         <TextInput style={styles.textInputStyle} placeholder='Masukkan Password'/> */}
+//                         <TouchableOpacity
+//                             style={styles.submitButtonStyleLogin} onPress={
+//                                 () =>
+//                                 // {Alert.alert('You tapped button Login');}
+//                                 // navigation.navigate('MainMenu')
+//                                 {
+//                                     // Alert.alert(`Username : ${usernameValue} \nPassword : ${passValue}`)
+//                                     // Alert.alert(
+//                                     //     'LOGIN',
+//                                     //     `Username : ${usernameValue} \nPassword : ${passValue}`,
+//                                     //     [
+//                                     //     //   {text: 'Cancel', onPress: () => console.log('Cancel Pressed!')},
+//                                     //       {text: 'OK', onPress: () => {
+//                                     //           navigation.navigate('MainMenu'), setUsernameValue(''), setPassValue('')
+//                                     //         }
+//                                     //         },
+//                                     //     ],
+//                                     //     { cancelable: false }
+//                                     //   )
+//                                     // console.log(`Log input: ${usernameValue} ${passValue}`)
+//                                     // console.log(`username :  ${usernameValue}`)
+//                                     // console.log(`pass :  ${passValue}`)
+//                                     // postLogin()
+//                                 }
+//                             }>
+//                         <Text style={styles.textStyleButton}> LOGIN </Text>
+//                         </TouchableOpacity>
+//                         {/* <View style={styles.separator}></View>
+//                         <TouchableOpacity
+//                             style={styles.submitButtonStyleRegister} onPress={
+//                                 () =>
+//                                 // {Alert.alert('You tapped button Register');}
+//                                 navigation.navigate('Register')
+//                             }>
+//                         <Text style={styles.textStyleButton}>REGISTER</Text>
+//                         </TouchableOpacity> */}
+//                     </View>
+//                 </View>
+//                 <Image source={logoPelindo} style={styles.imageStylePelindo}/>
+//             </View>
+//         </View>
+//         );
+//       }
+// }
+
 function LoginScreen({navigation}) {
     const [usernameValue, setUsernameValue] = React.useState('');
     const [passValue, setPassValue] = React.useState('');
+
+    const [dataLogin, setDataLogin] = useState({
+        messageCode: '',
+        messageDesc: ''
+    })
+
+    const postLogin = () => {
+        const dataAPILogin = {
+                username : `${usernameValue}`,
+                password : `${passValue}`
+        }
+        fetch('http://10.1.234.137:8080/api/v1/akun', {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            body : JSON.stringify(dataAPILogin)
+        })
+        .then(response => response.json())
+        .then(json => {
+            setDataLogin('')
+            console.log(`data json value : ${JSON.stringify(json)}`)
+            setDataLogin(json)
+            if(dataLogin.messageCode == '00'){
+                console.log('Data valid')
+                console.log(`data login message ${dataLogin.messageCode}`)
+                console.log(`data login message ${dataLogin.messageDesc}`)
+                console.log(`data object list : ${JSON.stringify(json.listData)}`)
+                AsyncStorage.setItem('user', JSON.stringify(json.listData))
+                .then(() => {
+                    console.log('data saved on asyncstorage');
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+                Alert.alert(
+                    'LOGIN BERHASIL',
+                    `Selamat datang ${usernameValue} `,
+                    [
+                    //   {text: 'Cancel', onPress: () => console.log('Cancel Pressed!')},
+                        {text: 'OK', onPress: () => {
+                              navigation.navigate('MainMenu'), setUsernameValue(''), setPassValue('')
+                            }
+                        },
+                    ],
+                    { cancelable: false }
+                )
+            } else if (dataLogin.messageCode == '06') {
+                console.log('Data not valid')
+                console.log(`data login message ${dataLogin.messageCode}`)
+                console.log(`data login message ${dataLogin.messageDesc}`)
+                if (Platform.OS === 'android') {
+                    ToastAndroid.show('Periksa username / password Anda', ToastAndroid.SHORT)
+                } else {
+                    AlertIOS.alert(msg);
+                }
+                setUsernameValue(''), setPassValue('')
+            }
+        })
+    }
 
     return(
         <View style={styles.container}>
@@ -62,19 +203,22 @@ function LoginScreen({navigation}) {
                                 // navigation.navigate('MainMenu')
                                 {
                                     // Alert.alert(`Username : ${usernameValue} \nPassword : ${passValue}`)
-                                    Alert.alert(
-                                        'LOGIN',
-                                        `Username : ${usernameValue} \nPassword : ${passValue}`,
-                                        [
-                                        //   {text: 'Cancel', onPress: () => console.log('Cancel Pressed!')},
-                                          {text: 'OK', onPress: () => {
-                                              navigation.navigate('MainMenu'), setUsernameValue(''), setPassValue('')
-                                            }
-                                            },
-                                        ],
-                                        { cancelable: false }
-                                      )
-                                    console.log(`Log input: ${usernameValue} ${passValue}`)
+                                    // Alert.alert(
+                                    //     'LOGIN',
+                                    //     `Username : ${usernameValue} \nPassword : ${passValue}`,
+                                    //     [
+                                    //     //   {text: 'Cancel', onPress: () => console.log('Cancel Pressed!')},
+                                    //       {text: 'OK', onPress: () => {
+                                    //           navigation.navigate('MainMenu'), setUsernameValue(''), setPassValue('')
+                                    //         }
+                                    //         },
+                                    //     ],
+                                    //     { cancelable: false }
+                                    //   )
+                                    // console.log(`Log input: ${usernameValue} ${passValue}`)
+                                    console.log(`username :  ${usernameValue}`)
+                                    console.log(`pass :  ${passValue}`)
+                                    postLogin()
                                 }
                             }>
                         <Text style={styles.textStyleButton}> LOGIN </Text>

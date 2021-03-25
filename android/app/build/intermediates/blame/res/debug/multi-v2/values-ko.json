@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "/Users/eko.asputro/Documents/React Projects/remoteApps/android/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values-ko/values-ko.xml",
+            "outputFile": "/Users/eko.asputro/Documents/React Projects/clone 2/remoteApps/android/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values-ko/values-ko.xml",
             "map": [
                 {
                     "source": "/Users/eko.asputro/.gradle/caches/transforms-2/files-2.1/885892f22b2e4fca3ab72d3683cd3315/jetified-ucrop-2.2.6-native/res/values-ko/values-ko.xml",

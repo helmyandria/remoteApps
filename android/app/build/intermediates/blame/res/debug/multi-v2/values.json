@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "/Users/eko.asputro/Documents/React Projects/remoteApps/android/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values/values.xml",
+            "outputFile": "/Users/eko.asputro/Documents/React Projects/clone 2/remoteApps/android/app/build/intermediates/incremental/mergeDebugResources/merged.dir/values/values.xml",
             "map": [
                 {
                     "source": "/Users/eko.asputro/.gradle/caches/transforms-2/files-2.1/9039e33500615c1ac50d1d4251b2d508/jetified-react-native-0.63.4/res/values/values.xml",
@@ -20,23 +20,6 @@
                         "endLines": "111,112,575,608,609,610,611,612,633,660,661,718,722,723,724,725,726,727,728,729,730,731,732,733,734,735,736,737,738,739,740,741,742,743,744,745,746,747,748,749,750,756,761,764,765,766,767,768,769,809,810,811,812,813,815,816,817,818,819,820,821,823,824,825,826,843,847,2689,2692,2703,2706,2710,2714,3047,3050,3053,3056,3292,3322,3331,3338,3367,3370,3373,3473,3479,4419",
                         "endColumns": "62,62,50,47,48,47,48,48,42,53,47,72,74,122,95,88,107,116,119,119,109,171,102,106,102,110,168,167,116,103,112,107,112,90,110,168,97,126,124,94,106,79,75,72,86,70,70,77,79,85,83,71,81,80,83,76,86,84,78,74,72,76,77,72,77,10,10,12,12,12,12,10,10,12,12,12,12,25,34,10,10,10,10,10,12,12,10",
                         "endOffsets": "6825,6888,37874,39832,39881,39929,39978,40027,41077,42416,42464,46301,46705,46828,46924,47013,47121,47238,47358,47478,47588,47760,47863,47970,48073,48184,48353,48521,48638,48742,48855,48963,49076,49167,49278,49447,49545,49672,49797,49892,49999,50506,51050,51430,51517,51588,51659,51737,51817,58876,58960,59032,59114,59195,59332,59409,59496,59581,59660,59735,59808,59956,60034,60107,60185,61494,61742,181488,181679,182192,182375,182577,182783,205490,205679,205878,206065,222743,224934,225472,225890,227410,227587,227766,236011,236376,297374"
-                    }
-                },
-                {
-                    "source": "/Users/eko.asputro/Documents/React Projects/remoteApps/android/app/src/main/res/values/strings.xml",
-                    "from": {
-                        "startLines": "1",
-                        "startColumns": "4",
-                        "startOffsets": "16",
-                        "endColumns": "47",
-                        "endOffsets": "59"
-                    },
-                    "to": {
-                        "startLines": "719",
-                        "startColumns": "4",
-                        "startOffsets": "46306",
-                        "endColumns": "47",
-                        "endOffsets": "46349"
                     }
                 },
                 {
@@ -95,22 +78,20 @@
                     }
                 },
                 {
-                    "source": "/Users/eko.asputro/Documents/React Projects/remoteApps/android/app/src/main/res/values/styles.xml",
+                    "source": "/Users/eko.asputro/Documents/React Projects/clone 2/remoteApps/android/app/build/generated/res/resValues/debug/values/gradleResValues.xml",
                     "from": {
-                        "startLines": "3",
-                        "startColumns": "4",
-                        "startOffsets": "54",
-                        "endLines": "6",
-                        "endColumns": "12",
-                        "endOffsets": "231"
+                        "startLines": "6,7",
+                        "startColumns": "4,4",
+                        "startOffsets": "157,221",
+                        "endColumns": "63,68",
+                        "endOffsets": "216,285"
                     },
                     "to": {
-                        "startLines": "856",
-                        "startColumns": "4",
-                        "startOffsets": "62309",
-                        "endLines": "859",
-                        "endColumns": "12",
-                        "endOffsets": "62486"
+                        "startLines": "682,683",
+                        "startColumns": "4,4",
+                        "startOffsets": "43719,43783",
+                        "endColumns": "63,68",
+                        "endOffsets": "43778,43847"
                     }
                 },
                 {
@@ -266,20 +247,20 @@
                     }
                 },
                 {
-                    "source": "/Users/eko.asputro/Documents/React Projects/remoteApps/android/app/build/generated/res/resValues/debug/values/gradleResValues.xml",
+                    "source": "/Users/eko.asputro/Documents/React Projects/clone 2/remoteApps/android/app/src/main/res/values/strings.xml",
                     "from": {
-                        "startLines": "6,7",
-                        "startColumns": "4,4",
-                        "startOffsets": "157,221",
-                        "endColumns": "63,68",
-                        "endOffsets": "216,285"
+                        "startLines": "1",
+                        "startColumns": "4",
+                        "startOffsets": "16",
+                        "endColumns": "47",
+                        "endOffsets": "59"
                     },
                     "to": {
-                        "startLines": "682,683",
-                        "startColumns": "4,4",
-                        "startOffsets": "43719,43783",
-                        "endColumns": "63,68",
-                        "endOffsets": "43778,43847"
+                        "startLines": "719",
+                        "startColumns": "4",
+                        "startOffsets": "46306",
+                        "endColumns": "47",
+                        "endOffsets": "46349"
                     }
                 },
                 {
@@ -299,6 +280,25 @@
                         "endLines": "8,107,108,109,110,304,305,306,887,2694,2697,2700,5429",
                         "endColumns": "51,60,61,61,63,58,56,53,12,12,12,12,24",
                         "endOffsets": "515,6574,6636,6698,6762,20002,20059,20113,64351,181743,181869,181997,353484"
+                    }
+                },
+                {
+                    "source": "/Users/eko.asputro/Documents/React Projects/clone 2/remoteApps/android/app/src/main/res/values/styles.xml",
+                    "from": {
+                        "startLines": "3",
+                        "startColumns": "4",
+                        "startOffsets": "54",
+                        "endLines": "6",
+                        "endColumns": "12",
+                        "endOffsets": "231"
+                    },
+                    "to": {
+                        "startLines": "856",
+                        "startColumns": "4",
+                        "startOffsets": "62309",
+                        "endLines": "859",
+                        "endColumns": "12",
+                        "endOffsets": "62486"
                     }
                 },
                 {

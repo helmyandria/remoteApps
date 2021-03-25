@@ -5,6 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import {BackgroundCarousel} from "../../utility/BackgroundCarousel";
 import { createStackNavigator } from '@react-navigation/stack';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import img_profile from '../../assets/images/profile.jpeg';
 
@@ -38,6 +39,29 @@ const images = [
 ];
 
 const Tab = createMaterialBottomTabNavigator();
+
+const retrieveData = () => {
+  AsyncStorage.getItem('user')
+    .then((value) => {
+      const user = value ? JSON.parse(value) : [];
+      // user.push(userDetails)
+      // AsyncStorage.setItem('user', JSON.stringify(user));
+      console.log(`value data : ${JSON.stringify(user)}`);
+      console.log(user.map((item) => item.customer_name));
+      console.log(user.map((item) => item.installation_code));
+      console.log(user.map((item) => item.installation_address));
+      console.log(user.map((item) => item.power_capacity));
+      console.log(user[0].installation_address);
+      console.log(user.length);
+      for (let i=0; i < user.length; i++){
+        console.log(`data loop : ${user[i].installation_address}`)
+      }
+      // Alert.alert(`${user.map((item) => item.name)}${'\n'}${user.map((item) => item.age)}`);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+};
 
 const navigationHome = () =>{
   return (
@@ -123,13 +147,13 @@ const HomeScreen = ({navigation}) => {
                   <Text style={styles.titleMenu}>Listrik</Text>
               </View>
             </TouchableOpacity>
-            {/* <TouchableOpacity activeOpacity = { .5 } onPress={() => navigation.navigate('LaporanTagihan')}> */}
+            <TouchableOpacity activeOpacity = { .5 } onPress={retrieveData}>
               <View style={styles.containerContentMenu}>
                 <MaterialCommunityIcons name='water' size={50} style={styles.iconMenu} />
                 <Text style={styles.titleMenu}>Menu</Text>
                 <Text style={styles.titleMenu}>Air</Text>
               </View>
-            {/* </TouchableOpacity> */}
+            </TouchableOpacity>
             {/* <TouchableOpacity activeOpacity = { .5 } onPress={() => navigation.navigate('TambahTagihan')}> */}
               <View style={styles.containerContentMenu}>
                 <MaterialCommunityIcons name='home-modern' size={50} style={styles.iconMenu} />

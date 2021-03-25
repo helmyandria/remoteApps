@@ -1,5 +1,5 @@
 import React,  { useState, useEffect } from 'react'
-import { StyleSheet, Picker, Text, View, Image, TouchableOpacity, StatusBar, Button } from 'react-native'
+import { FlatList, StyleSheet, Picker, Text, View, Image, TouchableOpacity, StatusBar, Button } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Dropdown } from 'sharingan-rn-modal-dropdown';
@@ -104,10 +104,38 @@ const MyStatusBar = ({backgroundColor, ...props}) => (
     </View>
   );
 
+const Item = ({price_type, meter_from, meter_to, tariff}) => {
+    return (
+        <View>
+            <View style={styles.containerInfoUser}>
+                <View style={{flexDirection:'row', alignContent:'center', alignSelf:'center', justifyContent:'center', width:'100%'}}>
+                    <Text style={{flex:1, textAlign:'center', marginBottom:10, fontWeight:'bold', color:'#000000'}}>KWH Awal</Text>
+                    <Text style={{flex:1, textAlign:'center', marginBottom:10, fontWeight:'bold', color:'#000000'}}>KWH Akhir</Text>
+                    <Text style={{flex:1, textAlign:'center', marginBottom:10, fontWeight:'bold', color:'#000000'}}>Penggunaan</Text>
+                </View>
+                <View style={{flexDirection:'row',alignContent:'center', alignSelf:'center', justifyContent:'center'}}>
+                    <Text style={{flex:1, textAlign:'center', color:'#ffffff', fontWeight:'bold',}}>{meter_from}</Text>
+                    <Text style={{flex:1, textAlign:'center', color:'#ffffff', fontWeight:'bold',}}>{meter_to}</Text>
+                    <Text style={{flex:1, textAlign:'center', color:'#ffffff', fontWeight:'bold',}}>-</Text>
+                </View>
+
+                <View style={styles.divView}/>
+                    <Text style={styles.titleH1}>KWH {price_type}</Text>
+                    <Text style={styles.valueText}>xxxx Kwh</Text>
+                    <View style={styles.divView}/>
+                    <Text style={styles.titleH1}>Biaya KWH {price_type}</Text>
+                    <Text style={styles.valueText}>Rp {tariff}</Text>
+            </View>
+            <View style={styles.divView}/>
+        </View>
+
+    )
+}
+
 const LaporanTagihan = ({navigation}) => {
-    const [selectedValueMonth, setSelectedValueMonth] = useState("des");
-    const [selectedValueYear, setSelectedValueYear] = useState("2020");
+    const [listTagihans, setlistTagihans] = useState([]);
     const [valueSS, setValueSS] = useState('');
+
     const onChangeSS = (value) => {
         setValueSS(value);
     };
@@ -117,50 +145,6 @@ const LaporanTagihan = ({navigation}) => {
     let bulan='';
     let tahun='';
     let textValue='';
-    // object data get
-    const [dataUser, setDataUser] = useState({
-        email: '',
-        first_name :'',
-        last_name:''
-    })
-    // hit api with method get
-    const getData = () => {
-        fetch('https://reqres.in/api/users/2')
-        .then(response => response.json())
-        .then(json => {
-            console.log(json)
-            setDataUser(json.data)
-        })
-    }
-    // object data post
-    const [dataJob, setDataJob] = useState({
-        name: '',
-        job : ''
-    })
-    // hit api with post data
-    const postData = () => {
-        const dataForAPI = {
-                name: `${var1}`,
-                job: `${var2}`
-        }
-        fetch('https://reqres.in/api/users', {
-            method: 'POST',
-            headers : {
-                'Content-type' : 'application/json'
-            },
-            body : JSON.stringify(dataForAPI)
-        })
-        .then(response => response.json())
-        .then(json => {
-            console.log(json)
-            setDataJob(json)
-            if (dataJob.name == 'zoro'){
-                console.log('data name is zoro')
-            } else {
-                console.log('data name is  not zoro')
-            }
-        })
-    }
 
      // object data post tagihan
      const [dataTagihan, setDataTagihan] = useState({
@@ -173,7 +157,7 @@ const LaporanTagihan = ({navigation}) => {
                 period : `${bulan}.${tahun}`,
                 installation_code : 'L/07791/03'
         }
-        fetch('http://10.1.234.54:8080/api/v1/taglistrik', {
+        fetch('http://10.1.237.101:8080/api/v1/taglistrik', {
             method: 'POST',
             headers : {
                 'Content-type' : 'application/json'
@@ -182,14 +166,12 @@ const LaporanTagihan = ({navigation}) => {
         })
         .then(response => response.json())
         .then(json => {
-            console.log(json)
             setDataTagihan(json)
-            // if (dataTagihan.name == 'zoro'){
-            //     console.log('data name is zoro')
-            // } else {
-            //     console.log('data name is  not zoro')
-            // }
-            console.log(`Log data tagihan: ${dataTagihan.messageCode}`)
+            console.log(`data json : ${JSON.stringify(json)}`)
+            console.log(`data object list : ${JSON.stringify(json.listTagihanListrik)}`)
+            DATA1.push(JSON.stringify(json.listTagihanListrik))
+            console.log(`data from array : ${DATA1}`)
+            setlistTagihans(DATA1)
         })
     }
 
@@ -211,27 +193,49 @@ const LaporanTagihan = ({navigation}) => {
       }
 
     useEffect(() => {
-        // Call API Method GET
-        // fetch('https://reqres.in/api/users/2')
-        // .then(response => response.json())
-        // .then(json => console.log(json))
-
-        // Call API Method POST
-        // const dataForAPI = {
-        //     name: "zoro",
-        //     job: "sword master"
-        // }
-        // fetch('https://reqres.in/api/users', {
-        //     method: 'POST',
-        //     headers : {
-        //         'Content-type' : 'application/json'
-        //     },
-        //     body : JSON.stringify(dataForAPI)
-        // })
-        // .then(response => response.json())
-        // .then(json => console.log(json))
-
     }, [])
+
+    const DATA = [
+        {
+            "price_type": "KVARH",
+            "meter_to": "27547",
+            "meter_from": "27547",
+            "ppju": "5",
+            "tariff": "1590",
+            "amount": "15367968",
+            "period": "03.2017",
+            "installation_code": "L/07791/03",
+            "id": 43002355
+        },
+        {
+            "price_type": "LWBP",
+            "meter_to": "5615",
+            "meter_from": "5447",
+            "ppju": "5",
+            "tariff": "1452",
+            "amount": "15367968",
+            "period": "03.2017",
+            "installation_code": "L/07791/03",
+            "id": 43002355
+        },
+        {
+            "price_type": "WBP",
+            "meter_to": "2358",
+            "meter_from": "2358",
+            "ppju": "5",
+            "tariff": "2178",
+            "amount": "15367968",
+            "period": "03.2017",
+            "installation_code": "L/07791/03",
+            "id": 43002355
+        }
+    ];
+
+    const DATA1 = []
+
+    const renderItem = ({ item }) => (
+        <Item price_type={item.price_type} meter_from={item.meter_from} meter_to={item.meter_to} tariff={item.tariff}/>
+      );
 
     return (
         <View style={styles.container}>
@@ -245,42 +249,21 @@ const LaporanTagihan = ({navigation}) => {
             <ScrollView>
                 <View style={styles.containerMainLapListrik}>
                     <View style={styles.containerDate}>
-                        {/* <Picker selectedValue={selectedValueMonth} style={styles.picker} onValueChange={(itemValue, itemIndex) => setSelectedValueMonth(itemValue)}>
-                            <Picker.Item label="Januari" value="jan" />
-                            <Picker.Item label="Februari" value="feb" />
-                            <Picker.Item label="Maret" value="mar" />
-                            <Picker.Item label="April" value="apr" />
-                            <Picker.Item label="Mei" value="mei" />
-                            <Picker.Item label="Juni" value="jun" />
-                            <Picker.Item label="Juli" value="jul" />
-                            <Picker.Item label="Agustus" value="ags" />
-                            <Picker.Item label="September" value="sep" />
-                            <Picker.Item label="Oktober" value="okt" />
-                            <Picker.Item label="November" value="nov" />
-                            <Picker.Item label="Desember" value="des" />
-                        </Picker> */}
-
-          <Dropdown
-            label="Bulan"
-            data={month}
-            disableSort
-            value={valueSS}
-            // onChange={onChangeSS}
-            onChange={value => onChangeHandler(value)}
-          />
-
-        <Dropdown
-            label="Tahun"
-            data={year}
-            value={valueSS}
-            // onChange={onChangeSS}
-            onChange={value => onChangeHandlerTahun(value)}
-          />
-                        {/* <Picker selectedValue={selectedValueYear} style={styles.picker} onValueChange={(itemValue, itemIndex) => setSelectedValueYear(itemValue)}>
-                            <Picker.Item label="2020" value="2020" />
-                            <Picker.Item label="2021" value="2021" />
-                            <Picker.Item label="2022" value="2022" />
-                        </Picker> */}
+                    <Dropdown
+                        label="Bulan"
+                        data={month}
+                        disableSort
+                        value={valueSS}
+                        // onChange={onChangeSS}
+                        onChange={value => onChangeHandler(value)}
+                    />
+                    <Dropdown
+                        label="Tahun"
+                        data={year}
+                        value={valueSS}
+                        // onChange={onChangeSS}
+                        onChange={value => onChangeHandlerTahun(value)}
+                    />
                     </View>
                     <View>
                         {/* <TouchableOpacity
@@ -338,21 +321,33 @@ const LaporanTagihan = ({navigation}) => {
                         <View style={styles.containerInfoUser}>
                             <Text style={styles.titleH1}>Nama</Text>
                             {/* <Text style={styles.valueText}>PT BERKAH INDUSTRI MESIN ANGKAT</Text> */}
-                            <Text style={styles.valueText}>{`${dataUser.first_name} ${dataUser.last_name}`}</Text>
-                            <Text style={styles.valueText}>{`${dataJob.name}`}</Text>
+                            {/* <Text style={styles.valueText}>{`${dataUser.first_name} ${dataUser.last_name}`}</Text>
+                            <Text style={styles.valueText}>{`${dataJob.name}`}</Text> */}
                             <Text style={styles.valueText}>{`${dataTagihan.messageCode}`}</Text>
                             <View style={styles.divView}/>
                             <Text style={styles.titleH1}>Alamat</Text>
                             {/* <Text style={styles.valueText}>JL.PRAPAT KURUNG UTARA 58 RT.002 RW.003 PERAK UTARA</Text> */}
-                            <Text style={styles.valueText}>{`${dataUser.email}`}</Text>
-                            <Text style={styles.valueText}>{`${dataJob.job}`}</Text>
+                            {/* <Text style={styles.valueText}>{`${dataUser.email}`}</Text>
+                            <Text style={styles.valueText}>{`${dataJob.job}`}</Text> */}
                             <Text style={styles.valueText}>{`${dataTagihan.messageDesc}`}</Text>
-                        </View>
-                        <View style={styles.divView}/>
-                        <View style={styles.containerInfoUser}>
+                            <View style={styles.divView}/>
                             <Text style={styles.titleH1}>No Installasi</Text>
                             <Text style={styles.valueText}>L/0210013017/00006</Text>
                             <View style={styles.divView}/>
+                        </View>
+                        <View style={styles.divView}/>
+                        {/* {listTagihans.map(listTagihanListrik => {
+                            return <Item price_type={listTagihanListrik.price_type} meter_from={listTagihanListrik.meter_from} meter_to={listTagihanListrik.meter_to} tariff={listTagihanListrik.tariff}/>
+                        })} */}
+                        <FlatList
+                            data={DATA}
+                            extraData={DATA}
+                            renderItem={renderItem}
+                            keyExtractor={item => item.price_type}
+                            refreshing={true}
+                        />
+
+                        {/* <View style={styles.containerInfoUser}>
                             <View style={{flexDirection:'row', alignContent:'center', alignSelf:'center', justifyContent:'center', width:'100%'}}>
                                 <Text style={{flex:1, textAlign:'center', marginBottom:10, fontWeight:'bold', color:'#000000'}}>KWH Awal</Text>
                                 <Text style={{flex:1, textAlign:'center', marginBottom:10, fontWeight:'bold', color:'#000000'}}>KWH Akhir</Text>
@@ -363,11 +358,9 @@ const LaporanTagihan = ({navigation}) => {
                                 <Text style={{flex:1, textAlign:'center', color:'#ffffff', fontWeight:'bold',}}>2900</Text>
                                 <Text style={{flex:1, textAlign:'center', color:'#ffffff', fontWeight:'bold',}}>80</Text>
                             </View>
-                        </View>
 
-                        <View style={styles.divView}/>
+                            <View style={styles.divView}/>
 
-                        <View style={styles.containerInfoUser}>
                             <Text style={styles.titleH1}>KWH WBP</Text>
                             <Text style={styles.valueText}>xxxx Kwh</Text>
 
@@ -375,10 +368,21 @@ const LaporanTagihan = ({navigation}) => {
 
                             <Text style={styles.titleH1}>Biaya KWH WBP</Text>
                             <Text style={styles.valueText}>Rp xxxxx</Text>
+                        </View> */}
+                        <View style={styles.divView}/>
+
+                        {/* <View style={styles.containerInfoUser}> */}
+                            {/* <Text style={styles.titleH1}>KWH WBP</Text>
+                            <Text style={styles.valueText}>xxxx Kwh</Text>
 
                             <View style={styles.divView}/>
 
-                            <Text style={styles.titleH1}>KWH LWBP</Text>
+                            <Text style={styles.titleH1}>Biaya KWH WBP</Text>
+                            <Text style={styles.valueText}>Rp xxxxx</Text>
+
+                            <View style={styles.divView}/> */}
+
+                            {/* <Text style={styles.titleH1}>KWH LWBP</Text>
                             <Text style={styles.valueText}>xxxx Kwh</Text>
 
                             <View style={styles.divView}/>
@@ -394,14 +398,14 @@ const LaporanTagihan = ({navigation}) => {
                             <View style={styles.divView}/>
 
                             <Text style={styles.titleH1}>Biaya Denda kVARH</Text>
-                            <Text style={styles.valueText}>xxxx Kwh</Text>
+                            <Text style={styles.valueText}>xxxx</Text>
 
-                            <View style={styles.divView}/>
+                            <View style={styles.divView}/> */}
 
-                            <Text style={styles.titleH1}>PPJU</Text>
-                            <Text style={styles.valueText}>x %</Text>
+                            {/* <Text style={styles.titleH1}>PPJU</Text>
+                            <Text style={styles.valueText}>x %</Text> */}
 
-                        </View>
+                        {/* </View> */}
 
                         <View style={{flexDirection:'row', backgroundColor:'#42d17f', borderRadius:8, padding:20, marginTop:10,}}>
                             <Text style={{textAlign:'left', flex:5, color:'#000000', fontSize:18, fontWeight:'bold'}}>TOTAL</Text>
