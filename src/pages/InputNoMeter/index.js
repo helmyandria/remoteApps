@@ -129,6 +129,9 @@ const InputNoMeterScreen = ({navigation}) => {
             console.log(`data json value ppju : ${JSON.stringify(json)}`)
             console.log(`value list data ppju : ${JSON.stringify(json.lisData)}`)
 
+            // clear data PPJU
+            PPJU = [];
+
             // set PPJU array to get data from json object
             const ppju = value ? JSON.parse(JSON.stringify(json.lisData)) : [];
             console.log(`value list data description ppju : ${ppju.map((item) => item.description)}`)
@@ -198,6 +201,7 @@ const InputNoMeterScreen = ({navigation}) => {
                     <Text style={styles.valueText}>{`${alamatPT}`}</Text>
                 </View>
                 <View style={styles.containerInput}>
+                    <Text style={styles.titlePriceType}>Title Price Type</Text>
                     <Text style={styles.titleH1}>KWH Awal</Text>
                     <TextInput style={styles.textInputStyle} keyboardType={'numeric'} maxLength={10} editable={false} />
                     <Text style={styles.titleH1}>KWH Akhir</Text>
@@ -248,7 +252,7 @@ const InputNoMeterScreen = ({navigation}) => {
                     })} */}
                     {/* {list.map(value => {console.log(`mapping list`)})} */}
                     {/* {Object.entries(list).map(([key, value]) => {return console.log('object entries list'), <Text>{value}</Text>}, )} */}
-                    {Object.entries(PPJU).map(([key, value]) => {return  <Text>{value.description} :<Text>{value.percentage} %</Text></Text>}, )}
+                    {Object.entries(PPJU).map(([key, value]) => {return  <Text>{value.description} : <Text>{value.percentage} %</Text></Text>}, )}
                     {/* {Object.entries(list).map(([key, value]) => {console.log(`mapping : ${value}`)})} */}
                     {console.log(`ppju data : ${PPJU}`)}
                     {console.log(`list length : ${list.length}`)}
@@ -336,6 +340,12 @@ const styles = StyleSheet.create({
         padding:20,
         borderRadius:8,
         marginTop:20,
+    },
+    titlePriceType: {
+        marginBottom:20,
+        fontWeight:'bold',
+        color:'#000000',
+        textAlign: 'center'
     },
     titleH1: {
         marginBottom:10,
