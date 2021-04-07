@@ -3,6 +3,7 @@ import { FlatList, StyleSheet, Picker, Text, View, Image, TouchableOpacity, Stat
 import { ScrollView } from 'react-native-gesture-handler';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Dropdown } from 'sharingan-rn-modal-dropdown';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
   export const month = [
     {
@@ -135,6 +136,9 @@ const Item = ({price_type, meter_from, meter_to, tariff}) => {
 const LaporanTagihan = ({navigation}) => {
     const [listTagihans, setlistTagihans] = useState([]);
     const [valueSS, setValueSS] = useState('');
+    const [namaPT, setNamaPT] = useState();
+    const [alamatPT, setAlamatPT] = useState();
+    const [noInstallasi, setNoInstallasi] = useState();
 
     const onChangeSS = (value) => {
         setValueSS(value);
@@ -157,7 +161,7 @@ const LaporanTagihan = ({navigation}) => {
                 period : `${bulan}.${tahun}`,
                 installation_code : 'L/07791/03'
         }
-        fetch('http://10.1.237.101:8080/api/v1/taglistrik', {
+        fetch('http://10.1.234.88:8080/api/v1/taglistrik', {
             method: 'POST',
             headers : {
                 'Content-type' : 'application/json'
@@ -194,6 +198,46 @@ const LaporanTagihan = ({navigation}) => {
 
     useEffect(() => {
     }, [])
+
+    useEffect(() => {
+        AsyncStorage.getItem('user')
+        .then((value) => {
+          const user = value ? JSON.parse(value) : [];
+          console.log(`value data : ${JSON.stringify(user)}`);
+          for (let i=0; i < user.length; i++){
+              // console.log(`data loop : ${user[i].installation_code}`)
+              nameArray.push(
+              {
+                  value: `${user[i].installation_code}`,
+                  label: `${user[i].installation_code}`
+              }
+              );
+            }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
+        console.log(`useEffect running`)
+  }, []);
+
+    const onChangeHandlerNoInstallasi = (value) => {
+        console.log(`installation_code selected : ${value}`);
+        const search = nameArray => nameArray.label === value;
+        console.log(`index on selected : ${nameArray.findIndex(search)-1}`);
+        AsyncStorage.getItem('user')
+        .then((value) => {
+            const findByInstallationCode = value ? JSON.parse(value) : [];
+            console.log(`data pt name : ${findByInstallationCode[nameArray.findIndex(search)-1].customer_name}`)
+            console.log(`data pt address : ${findByInstallationCode[nameArray.findIndex(search)-1].installation_address} `)
+            setNamaPT(findByInstallationCode[nameArray.findIndex(search)-1].customer_name);
+            setAlamatPT(findByInstallationCode[nameArray.findIndex(search)-1].installation_address);
+            setNoInstallasi(findByInstallationCode[nameArray.findIndex(search)-1].installation_code);
+        })
+        .catch((error) => {
+        console.log(error);
+        });
+    }
 
     const DATA = [
         {
@@ -237,6 +281,13 @@ const LaporanTagihan = ({navigation}) => {
         <Item price_type={item.price_type} meter_from={item.meter_from} meter_to={item.meter_to} tariff={item.tariff}/>
       );
 
+    var nameArray=[
+        {
+            value: '',
+            label: '',
+        },
+    ]
+
     return (
         <View style={styles.container}>
             <MyStatusBar backgroundColor="#1d6ea4" barStyle="light-content" />
@@ -248,22 +299,32 @@ const LaporanTagihan = ({navigation}) => {
             </View>
             <ScrollView>
                 <View style={styles.containerMainLapListrik}>
+                    <View style={styles.containerNoInstallasi}>
+                        <Dropdown
+                            label="No Installasi"
+                            data={nameArray}
+                            disableSort
+                            value={nameArray}
+                            // onChange={onChangeSS}
+                            onChange={value => onChangeHandlerNoInstallasi(value)}
+                        />
+                    </View>
                     <View style={styles.containerDate}>
-                    <Dropdown
-                        label="Bulan"
-                        data={month}
-                        disableSort
-                        value={valueSS}
-                        // onChange={onChangeSS}
-                        onChange={value => onChangeHandler(value)}
-                    />
-                    <Dropdown
-                        label="Tahun"
-                        data={year}
-                        value={valueSS}
-                        // onChange={onChangeSS}
-                        onChange={value => onChangeHandlerTahun(value)}
-                    />
+                        <Dropdown
+                            label="Bulan"
+                            data={month}
+                            disableSort
+                            value={valueSS}
+                            // onChange={onChangeSS}
+                            onChange={value => onChangeHandler(value)}
+                        />
+                        <Dropdown
+                            label="Tahun"
+                            data={year}
+                            value={valueSS}
+                            // onChange={onChangeSS}
+                            onChange={value => onChangeHandlerTahun(value)}
+                        />
                     </View>
                     <View>
                         {/* <TouchableOpacity
@@ -323,16 +384,18 @@ const LaporanTagihan = ({navigation}) => {
                             {/* <Text style={styles.valueText}>PT BERKAH INDUSTRI MESIN ANGKAT</Text> */}
                             {/* <Text style={styles.valueText}>{`${dataUser.first_name} ${dataUser.last_name}`}</Text>
                             <Text style={styles.valueText}>{`${dataJob.name}`}</Text> */}
-                            <Text style={styles.valueText}>{`${dataTagihan.messageCode}`}</Text>
+                            {/* <Text style={styles.valueText}>{`${dataTagihan.messageCode}`}</Text> */}
+                            <Text style={styles.valueText}>{`${namaPT}`}</Text>
                             <View style={styles.divView}/>
                             <Text style={styles.titleH1}>Alamat</Text>
                             {/* <Text style={styles.valueText}>JL.PRAPAT KURUNG UTARA 58 RT.002 RW.003 PERAK UTARA</Text> */}
                             {/* <Text style={styles.valueText}>{`${dataUser.email}`}</Text>
                             <Text style={styles.valueText}>{`${dataJob.job}`}</Text> */}
-                            <Text style={styles.valueText}>{`${dataTagihan.messageDesc}`}</Text>
+                            {/* <Text style={styles.valueText}>{`${dataTagihan.messageDesc}`}</Text> */}
+                            <Text style={styles.valueText}>{`${alamatPT}`}</Text>
                             <View style={styles.divView}/>
                             <Text style={styles.titleH1}>No Installasi</Text>
-                            <Text style={styles.valueText}>L/0210013017/00006</Text>
+                            <Text style={styles.valueText}>{`${noInstallasi}`}</Text>
                             <View style={styles.divView}/>
                         </View>
                         <View style={styles.divView}/>
@@ -450,12 +513,16 @@ const styles = StyleSheet.create({
         width:'100%',
         height:'100%'
     },
+    containerNoInstallasi: {
+        marginLeft: 25,
+        marginRight:25,
+        marginTop:10
+    },
     containerDate: {
         flexDirection:'row',
         justifyContent:'space-between',
         marginLeft: 25,
         marginRight:25,
-        marginTop:10,
     },
     picker:{
         height: 50, width: 150

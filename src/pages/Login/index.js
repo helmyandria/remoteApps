@@ -123,7 +123,7 @@ function LoginScreen({navigation}) {
                 username : `${usernameValue}`,
                 password : `${passValue}`
         }
-        fetch('http://10.1.234.137:8080/api/v1/akun', {
+        fetch('http://10.1.234.88:8080/api/v1/akun', {
             method: 'POST',
             headers : {
                 'Content-type' : 'application/json'

@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import { StyleSheet, Text, View, TextInput, Image, TouchableOpacity, Alert, StatusBar} from 'react-native'
+import { StyleSheet, Text, View, TextInput, Image, TouchableOpacity, Alert, StatusBar, FlatList} from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler';
 import { color } from 'react-native-reanimated';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -41,12 +41,30 @@ function InputNoMeter({ navigation, route }) {
     );
 }
 
+var PPJU = [
+    {
+      description: '',
+      percentage: ''
+    }
+  ];
+
+const Item = ({ description, percentage }) => {
+    return (
+        <View style={{flexDirection:'row'}}>
+            <Text style={{flex : 5, fontWeight:'bold', color:'#000000'}}>{description}</Text>
+            <Text style={{flex : 2, fontWeight:'bold', color:'#000000'}}>:</Text>
+            <Text style={{flex : 5, fontWeight:'bold', color:'#000000'}}>{percentage}%</Text>
+        </View>
+    )
+};
+
 const InputNoMeterScreen = ({navigation}) => {
     const [image, setImage] = useState('https://www.arsenal.com/sites/default/files/styles/player_featured_image_1045x658/public/images/Tierney_1045x658_0.jpg?itok=mjvpH5MI');
     const [shouldShow, setShouldShow] = useState(false);
     const [containerImageNull, setContainerImageNull] = useState(true);
     const [namaPT, setNamaPT] = useState();
     const [alamatPT, setAlamatPT] = useState();
+    const [list, setList] = useState([]);
 
     var nameArray=[
         {
@@ -54,6 +72,10 @@ const InputNoMeterScreen = ({navigation}) => {
             label: '',
         },
     ]
+
+    const renderPPJU = ({ item }) => (
+        <Item description={item.description} percentage={item.percentage} />
+      );
 
     const onChangeHandler = (value) => {
         console.log(`installation_code selected : ${value}`);
@@ -70,6 +92,60 @@ const InputNoMeterScreen = ({navigation}) => {
         .catch((error) => {
         console.log(error);
         });
+        getPriceType(value);
+        getPpju(value);
+    }
+
+    const getPriceType = (value) => {
+        const priceType = {
+            installation_code : `${value}`,
+        }
+        fetch('http://10.1.234.88:8080/api/v1/pricetype', {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            body : JSON.stringify(priceType)
+        })
+        .then(response => response.json())
+        .then(json => {
+            console.log(`data json value price type : ${JSON.stringify(json)}`)
+        })
+    }
+
+    const getPpju = (value) => {
+        const priceType = {
+            installation_code : `${value}`,
+        }
+        fetch('http://10.1.234.88:8080/api/v1/ppju', {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            body : JSON.stringify(priceType)
+        })
+        .then(response => response.json())
+        .then(json => {
+            console.log(`data json value ppju : ${JSON.stringify(json)}`)
+            console.log(`value list data ppju : ${JSON.stringify(json.lisData)}`)
+
+            // set PPJU array to get data from json object
+            const ppju = value ? JSON.parse(JSON.stringify(json.lisData)) : [];
+            console.log(`value list data description ppju : ${ppju.map((item) => item.description)}`)
+            for (let i=0; i < ppju.length; i++){
+                PPJU.push({
+                    description: ppju[i].description,
+                    percentage: ppju[i].percentage
+                })
+                console.log(`desc : ${ppju[i].description}`)
+                console.log(`percen : ${ppju[i].percentage}`)
+            }
+            // setList(`${json.lisData}`)
+            setList(JSON.stringify(json.lisData))
+            console.log(`array PPJU : ${PPJU}`)
+            console.log(`value list : ${list}`)
+        })
+        // .finally(() => setLoading(false));
     }
 
     useEffect(() => {
@@ -78,7 +154,7 @@ const InputNoMeterScreen = ({navigation}) => {
             const user = value ? JSON.parse(value) : [];
             console.log(`value data : ${JSON.stringify(user)}`);
             for (let i=0; i < user.length; i++){
-                console.log(`data loop : ${user[i].installation_code}`)
+                // console.log(`data loop : ${user[i].installation_code}`)
                 nameArray.push(
                 {
                     value: `${user[i].installation_code}`,
@@ -86,11 +162,12 @@ const InputNoMeterScreen = ({navigation}) => {
                 }
                 );
               }
-
           })
           .catch((error) => {
             console.log(error);
           });
+
+          console.log(`useEffect running`)
     }, []);
 
     return (
@@ -129,7 +206,6 @@ const InputNoMeterScreen = ({navigation}) => {
                     <TextInput style={styles.textInputStyle} keyboardType={'numeric'} maxLength={10} editable={false} />
                     <Text style={styles.titleH1}>Foto No Meter</Text>
                     <TouchableOpacity onPress={()=>
-
                         {ImagePickerCamera.openCamera({
                                     width: 300,
                                     height: 400,
@@ -143,7 +219,6 @@ const InputNoMeterScreen = ({navigation}) => {
                                   });
                         }
                         }>
-
                         {shouldShow ? (
                             <Image
                                 source={{uri:image}}
@@ -151,7 +226,6 @@ const InputNoMeterScreen = ({navigation}) => {
                             }/>
                         ) : null
                         }
-
                         {containerImageNull ? (
                             <View style={styles.layoutImage}>
                                 <MaterialCommunityIcons name="plus-circle-outline" size={50} style={styles.iconContent}/>
@@ -159,6 +233,29 @@ const InputNoMeterScreen = ({navigation}) => {
                         ) : null}
 
                     </TouchableOpacity>
+                </View>
+                <View style={{flexDirection:'row', backgroundColor: '#F2F2F2', marginLeft:25, marginRight:25, padding:20, borderRadius:8, marginTop:20,}}>
+                    {/* list PPJU */}
+                    {/* <FlatList
+                        data={list}
+                        renderItem={renderPPJU}
+                        keyExtractor={item => item.id}
+                        extraData={list}
+                        refreshing={list}
+                    /> */}
+                    {/* {list.map(lisData => {
+                        return <Item description={'t'} percentage={'s'}/>
+                    })} */}
+                    {/* {list.map(value => {console.log(`mapping list`)})} */}
+                    {/* {Object.entries(list).map(([key, value]) => {return console.log('object entries list'), <Text>{value}</Text>}, )} */}
+                    {Object.entries(PPJU).map(([key, value]) => {return  <Text>{value.description} :<Text>{value.percentage} %</Text></Text>}, )}
+                    {/* {Object.entries(list).map(([key, value]) => {console.log(`mapping : ${value}`)})} */}
+                    {console.log(`ppju data : ${PPJU}`)}
+                    {console.log(`list length : ${list.length}`)}
+                    {console.log(`list description : ${list.description}`)}
+                    {console.log(`isinya list di tampilan : ${list}`)}
+                    {console.log(`get data from array : ${JSON.stringify(list.description)}`)}
+                    {/* list PPJU */}
                 </View>
                 <View style={{flexDirection:'row'}}>
                     <TouchableOpacity
@@ -258,7 +355,8 @@ const styles = StyleSheet.create({
         marginBottom:20,
         borderRadius:8,
         backgroundColor:'#dfe6e9',
-        padding:10
+        padding:10,
+        color:'#000000'
     },
     iconContent: {
         color: '#000000'
