@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import { StyleSheet, Text, View, TextInput, Image, TouchableOpacity, Alert, StatusBar, FlatList} from 'react-native'
+import { StyleSheet, Text, View, TextInput, Image, TouchableOpacity, Alert, StatusBar, FlatList, ActivityIndicator} from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler';
 import { color } from 'react-native-reanimated';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -65,6 +65,10 @@ const InputNoMeterScreen = ({navigation}) => {
     const [namaPT, setNamaPT] = useState();
     const [alamatPT, setAlamatPT] = useState();
     const [list, setList] = useState([]);
+    const [pricetype, setPriceType] = useState([]);
+    const [isLoading, setLoading] = useState(true);
+    const [listPrice, setListPrice] = useState([]);
+    const [noInstall, setNoInstall] = useState([]);
 
     var nameArray=[
         {
@@ -92,15 +96,15 @@ const InputNoMeterScreen = ({navigation}) => {
         .catch((error) => {
         console.log(error);
         });
-        getPriceType(value);
         getPpju(value);
+        getPriceType(value);
     }
 
     const getPriceType = (value) => {
         const priceType = {
             installation_code : `${value}`,
         }
-        fetch('http://10.1.234.88:8080/api/v1/pricetype', {
+        fetch('http://10.1.234.163:8080/api/v1/pricetype', {
             method: 'POST',
             headers : {
                 'Content-type' : 'application/json'
@@ -110,6 +114,38 @@ const InputNoMeterScreen = ({navigation}) => {
         .then(response => response.json())
         .then(json => {
             console.log(`data json value price type : ${JSON.stringify(json)}`)
+            console.log(`data json value price type : ${JSON.stringify(json.listData)}`)
+            // set result json data to array DATA
+            // DATA = [];
+            const data = value ? JSON.parse(JSON.stringify(json.listData)) : [];
+            console.log(`value data  ${data}`);
+            setListPrice(data);
+            let datam = json.listData;
+            console.log(`List Price Type ${JSON.stringify(listPrice)}`);
+            // for (let i=0; i < data.length; i++){
+            //     DATA.push({
+            //         id: data[i].id,
+            //         price_type: data[i].price_type,
+            //         price_code: data[i].price_code,
+            //         tariff: data[i].tariff,
+            //         meter_to: data[i].meter_to,
+            //     })
+            //     console.log(`price_type : ${data[i].price_type}`)
+            // }
+
+            // set result json data to array DATA
+            // const data = value ? JSON.parse(JSON.stringify(json.listData)) : [];
+            // for (let i=0; i < data.length; i++){
+            //     setPriceType({
+            //         id: data[i].id,
+            //         price_type: data[i].price_type,
+            //         price_code: data[i].price_code,
+            //         tariff: data[i].tariff,
+            //         meter_to: data[i].meter_to,
+            //     })
+            //     console.log(`price_type : ${data[i].price_type}`)
+            //     console.log(`price_code : ${data[i].price_code}`)
+            // }
         })
     }
 
@@ -117,7 +153,7 @@ const InputNoMeterScreen = ({navigation}) => {
         const priceType = {
             installation_code : `${value}`,
         }
-        fetch('http://10.1.234.88:8080/api/v1/ppju', {
+        fetch('http://10.1.234.163:8080/api/v1/ppju', {
             method: 'POST',
             headers : {
                 'Content-type' : 'application/json'
@@ -156,15 +192,17 @@ const InputNoMeterScreen = ({navigation}) => {
           .then((value) => {
             const user = value ? JSON.parse(value) : [];
             console.log(`value data : ${JSON.stringify(user)}`);
+            let userdata = [] ;
             for (let i=0; i < user.length; i++){
-                // console.log(`data loop : ${user[i].installation_code}`)
-                nameArray.push(
+                userdata.push(
                 {
                     value: `${user[i].installation_code}`,
                     label: `${user[i].installation_code}`
                 }
                 );
               }
+            setNoInstall(userdata);
+
           })
           .catch((error) => {
             console.log(error);
@@ -172,6 +210,97 @@ const InputNoMeterScreen = ({navigation}) => {
 
           console.log(`useEffect running`)
     }, []);
+
+    useEffect(()=>{
+        console.log(`use Effect price type`);
+
+    }, [pricetype]);
+
+    let DATA = [
+        // {
+        //     "id": "41356",
+        //     "installation_code": "L/07791/03",
+        //     "price_type": "KVARH",
+        //     "price_code": "L49",
+        //     "tariff": "1590",
+        //     "meter_to": "11600"
+        // },
+        // {
+        //     "id": "41357",
+        //     "installation_code": "L/07791/03",
+        //     "price_type": "LWBP",
+        //     "price_code": "L47",
+        //     "tariff": "1452",
+        //     "meter_to": "230783"
+        // },
+        // {
+        //     "id": "41358",
+        //     "installation_code": "L/07791/03",
+        //     "price_type": "WBP",
+        //     "price_code": "L48",
+        //     "tariff": "2178",
+        //     "meter_to": "44234"
+        // }
+        {
+            id :'',
+            installation_code: '',
+            price_type: '',
+            price_code: '',
+            tariff: '',
+            meter_to: ''
+        }
+    ];
+
+    const listItem = ({ item }) => (
+        <Item price_type={item.price_type} meter_to={item.meter_to} price_code={item.price_code} tariff={item.tariff}/>
+      );
+
+    const Item = ({price_type, meter_to, price_code, tariff}) => {
+        return (
+            <View style={styles.containerInput}>
+                <View>
+                    <Text style={styles.titlePriceType}>{price_type}</Text>
+                        <Text style={styles.titleH1}>KWH Awal</Text>
+                        <TextInput style={styles.textInputStyle} keyboardType={'numeric'} maxLength={10} editable={false} value={meter_to} />
+                        <Text style={styles.titleH1}>KWH Akhir</Text>
+                        <TextInput style={styles.textInputStyle} keyboardType={'numeric'} maxLength={6} onChangeText={text => setKwhAkhir(text)} value={kwhAkhir}/>
+                        <Text style={styles.titleH1}>Penggunaan</Text>
+                        <TextInput style={styles.textInputStyle} keyboardType={'numeric'} maxLength={10} editable={false} value={`${kwhAkhir-parseInt(meter_to)}`} onChangeText={text => setKwhAkhir(text)} />
+                        <Text style={styles.titleH1}>Foto No Meter</Text>
+                        <TouchableOpacity onPress={()=>
+                            {ImagePickerCamera.openCamera({
+                                        width: 300,
+                                        height: 400,
+                                        // cropping: true
+                                    }).then(image => {
+                                        console.log(image);
+                                        setImage(image.path);
+                                        console.log('Image : '+image.path)
+                                            setShouldShow(true)
+                                            setContainerImageNull(false)
+                                    });
+                            }
+                            }>
+                            {shouldShow ? (
+                                <Image
+                                    source={{uri:image}}
+                                    style={{ backgroundColor:'#000000', height: 450, width: '100%', resizeMode:'stretch'}
+                                }/>
+                            ) : null
+                            }
+                            {containerImageNull ? (
+                                <View style={styles.layoutImage}>
+                                    <MaterialCommunityIcons name="plus-circle-outline" size={50} style={styles.iconContent}/>
+                                </View>
+                            ) : null}
+
+                        </TouchableOpacity>
+                </View>
+            </View>
+        )
+    }
+
+    const [kwhAkhir, setKwhAkhir] = React.useState('');
 
     return (
         <View style={styles.container}>
@@ -187,9 +316,9 @@ const InputNoMeterScreen = ({navigation}) => {
                 <View style={styles.containerInfoUser}>
                     <Dropdown
                         label="No Installasi"
-                        data={nameArray}
+                        data={noInstall}
                         disableSort
-                        value={nameArray}
+                        value={noInstall}
                         // onChange={onChangeSS}
                         onChange={value => onChangeHandler(value)}
                     />
@@ -200,45 +329,15 @@ const InputNoMeterScreen = ({navigation}) => {
                     <Text style={styles.titleH1}>Alamat</Text>
                     <Text style={styles.valueText}>{`${alamatPT}`}</Text>
                 </View>
-                <View style={styles.containerInput}>
-                    <Text style={styles.titlePriceType}>Title Price Type</Text>
-                    <Text style={styles.titleH1}>KWH Awal</Text>
-                    <TextInput style={styles.textInputStyle} keyboardType={'numeric'} maxLength={10} editable={false} />
-                    <Text style={styles.titleH1}>KWH Akhir</Text>
-                    <TextInput style={styles.textInputStyle} keyboardType={'numeric'} maxLength={6}/>
-                    <Text style={styles.titleH1}>Penggunaan</Text>
-                    <TextInput style={styles.textInputStyle} keyboardType={'numeric'} maxLength={10} editable={false} />
-                    <Text style={styles.titleH1}>Foto No Meter</Text>
-                    <TouchableOpacity onPress={()=>
-                        {ImagePickerCamera.openCamera({
-                                    width: 300,
-                                    height: 400,
-                                    // cropping: true
-                                  }).then(image => {
-                                    console.log(image);
-                                    setImage(image.path);
-                                    console.log('Image : '+image.path)
-                                        setShouldShow(true)
-                                        setContainerImageNull(false)
-                                  });
-                        }
-                        }>
-                        {shouldShow ? (
-                            <Image
-                                source={{uri:image}}
-                                style={{ backgroundColor:'#000000', height: 450, width: '100%', resizeMode:'stretch'}
-                            }/>
-                        ) : null
-                        }
-                        {containerImageNull ? (
-                            <View style={styles.layoutImage}>
-                                <MaterialCommunityIcons name="plus-circle-outline" size={50} style={styles.iconContent}/>
-                            </View>
-                        ) : null}
-
-                    </TouchableOpacity>
-                </View>
-                <View style={{flexDirection:'row', backgroundColor: '#F2F2F2', marginLeft:25, marginRight:25, padding:20, borderRadius:8, marginTop:20,}}>
+                    {/* data price type */}
+                    <FlatList
+                            data={listPrice}
+                            // extraData={DATA}
+                            renderItem={listItem}
+                            keyExtractor={item => item.price_type}
+                    />
+                    {/* data price type */}
+                <View style={{flexDirection:'row', backgroundColor: '#F2F2F2', marginLeft:25, marginRight:25, padding:20, borderRadius:8}}>
                     {/* list PPJU */}
                     {/* <FlatList
                         data={list}
