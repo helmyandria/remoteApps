@@ -129,7 +129,6 @@ const Item = ({price_type, meter_from, meter_to, tariff}) => {
             </View>
             <View style={styles.divView}/>
         </View>
-
     )
 }
 
@@ -139,6 +138,8 @@ const LaporanTagihan = ({navigation}) => {
     const [namaPT, setNamaPT] = useState();
     const [alamatPT, setAlamatPT] = useState();
     const [noInstallasi, setNoInstallasi] = useState();
+    const [dNoInstallasi, setdNoInstallasi] = useState();
+    const [paramNoInstall, setParamNoInstall] = useState('');
 
     const onChangeSS = (value) => {
         setValueSS(value);
@@ -149,6 +150,7 @@ const LaporanTagihan = ({navigation}) => {
     let bulan='';
     let tahun='';
     let textValue='';
+    let noInstall = '';
 
      // object data post tagihan
      const [dataTagihan, setDataTagihan] = useState({
@@ -156,12 +158,12 @@ const LaporanTagihan = ({navigation}) => {
         messageDesc : ''
     })
     // hit api with post data tagihan
-    const postDataTagihan = () => {
+    const postDataTagihan = (installation_code) => {
         const dataForAPITagihan = {
                 period : `${bulan}.${tahun}`,
-                installation_code : 'L/07791/03'
+                installation_code : `${paramNoInstall}`
         }
-        fetch('http://10.1.234.163:8080/api/v1/taglistrik', {
+        fetch('http://10.1.234.135:8080/api/v1/taglistrik', {
             method: 'POST',
             headers : {
                 'Content-type' : 'application/json'
@@ -170,12 +172,15 @@ const LaporanTagihan = ({navigation}) => {
         })
         .then(response => response.json())
         .then(json => {
-            setDataTagihan(json)
+            // setDataTagihan(json)
             console.log(`data json : ${JSON.stringify(json)}`)
-            console.log(`data object list : ${JSON.stringify(json.listTagihanListrik)}`)
-            DATA1.push(JSON.stringify(json.listTagihanListrik))
-            console.log(`data from array : ${DATA1}`)
-            setlistTagihans(DATA1)
+            // console.log(`data object list : ${JSON.stringify(json.listTagihanListrik)}`)
+            // DATA1.push(JSON.stringify(json.listTagihanListrik))
+            // console.log(`data from array : ${DATA1}`)
+
+            const data = installation_code ? JSON.parse(JSON.stringify(json.listTagihanListrik)) : [];
+            console.log(`post data tagihan value : ${data}`);
+            setlistTagihans(data)
         })
     }
 
@@ -189,12 +194,12 @@ const LaporanTagihan = ({navigation}) => {
         // console.log(`Log var 1 after update: ${var1}`);
         console.log(`bulan : ${bulan}`);
         // console.log(`tahun : ${tahun}`);
-      }
+    }
 
-      const onChangeHandlerTahun = (value) => {
+    const onChangeHandlerTahun = (value) => {
         tahun = `${value}`;
         console.log(`tahun : ${tahun}`);
-      }
+    }
 
     useEffect(() => {
     }, [])
@@ -203,16 +208,18 @@ const LaporanTagihan = ({navigation}) => {
         AsyncStorage.getItem('user')
         .then((value) => {
           const user = value ? JSON.parse(value) : [];
-          console.log(`value data : ${JSON.stringify(user)}`);
+        //   console.log(`value data : ${JSON.stringify(user)}`);
+          let ptdata = [] ;
           for (let i=0; i < user.length; i++){
-              // console.log(`data loop : ${user[i].installation_code}`)
-              nameArray.push(
-              {
-                  value: `${user[i].installation_code}`,
-                  label: `${user[i].installation_code}`
-              }
-              );
+            // console.log(`data loop : ${user[i].installation_code}`)
+            ptdata.push(
+            {
+                value: `${user[i].installation_code}`,
+                label: `${user[i].installation_code}`
             }
+            );
+          }
+            setdNoInstallasi(ptdata);
         })
         .catch((error) => {
           console.log(error);
@@ -222,17 +229,22 @@ const LaporanTagihan = ({navigation}) => {
   }, []);
 
     const onChangeHandlerNoInstallasi = (value) => {
+        noInstall = `${value}`;
+        setParamNoInstall(`${value}`)
+        console.log(`isi var no install : ${noInstall}`);
         console.log(`installation_code selected : ${value}`);
-        const search = nameArray => nameArray.label === value;
-        console.log(`index on selected : ${nameArray.findIndex(search)-1}`);
+        // const search = nameArray => nameArray.label === value;
+        const search = dNoInstallasi => dNoInstallasi.label === value;
+        // console.log(`index on selected : ${nameArray.findIndex(search)-1}`);
+        console.log(`index on selected : ${dNoInstallasi.findIndex(search)-1}`);
         AsyncStorage.getItem('user')
         .then((value) => {
             const findByInstallationCode = value ? JSON.parse(value) : [];
-            console.log(`data pt name : ${findByInstallationCode[nameArray.findIndex(search)-1].customer_name}`)
-            console.log(`data pt address : ${findByInstallationCode[nameArray.findIndex(search)-1].installation_address} `)
-            setNamaPT(findByInstallationCode[nameArray.findIndex(search)-1].customer_name);
-            setAlamatPT(findByInstallationCode[nameArray.findIndex(search)-1].installation_address);
-            setNoInstallasi(findByInstallationCode[nameArray.findIndex(search)-1].installation_code);
+            console.log(`data pt name : ${findByInstallationCode[dNoInstallasi.findIndex(search)].customer_name}`)
+            console.log(`data pt address : ${findByInstallationCode[dNoInstallasi.findIndex(search)].installation_address} `)
+            setNamaPT(findByInstallationCode[dNoInstallasi.findIndex(search)].customer_name);
+            setAlamatPT(findByInstallationCode[dNoInstallasi.findIndex(search)].installation_address);
+            setNoInstallasi(findByInstallationCode[dNoInstallasi.findIndex(search)].installation_code);
         })
         .catch((error) => {
         console.log(error);
@@ -302,9 +314,9 @@ const LaporanTagihan = ({navigation}) => {
                     <View style={styles.containerNoInstallasi}>
                         <Dropdown
                             label="No Installasi"
-                            data={nameArray}
+                            data={dNoInstallasi}
                             disableSort
-                            value={nameArray}
+                            value={dNoInstallasi}
                             // onChange={onChangeSS}
                             onChange={value => onChangeHandlerNoInstallasi(value)}
                         />
@@ -371,7 +383,7 @@ const LaporanTagihan = ({navigation}) => {
                                 marginRight:25,
                                 borderColor: '#fff',}} onPress={
                                 () =>
-                                {postDataTagihan()}
+                                {postDataTagihan(`${paramNoInstall}`)}
                             }>
                         <Text style={{color:'#fff', textAlign:'center',}}> Cari </Text>
                         </TouchableOpacity>
@@ -403,11 +415,11 @@ const LaporanTagihan = ({navigation}) => {
                             return <Item price_type={listTagihanListrik.price_type} meter_from={listTagihanListrik.meter_from} meter_to={listTagihanListrik.meter_to} tariff={listTagihanListrik.tariff}/>
                         })} */}
                         <FlatList
-                            data={DATA}
-                            extraData={DATA}
+                            data={listTagihans}
+                            // extraData={listTagihans}
                             renderItem={renderItem}
                             keyExtractor={item => item.price_type}
-                            refreshing={true}
+                            // refreshing={true}
                         />
 
                         {/* <View style={styles.containerInfoUser}>

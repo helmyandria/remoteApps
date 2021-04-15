@@ -83,15 +83,15 @@ const InputNoMeterScreen = ({navigation}) => {
 
     const onChangeHandler = (value) => {
         console.log(`installation_code selected : ${value}`);
-        const search = nameArray => nameArray.label === value;
-        console.log(`index on selected : ${nameArray.findIndex(search)-1}`);
+        const search = noInstall => noInstall.label === value;
+        console.log(`index on selected : ${noInstall.findIndex(search)}`);
         AsyncStorage.getItem('user')
         .then((value) => {
             const findByInstallationCode = value ? JSON.parse(value) : [];
-            console.log(`data pt name : ${findByInstallationCode[nameArray.findIndex(search)-1].customer_name}`)
-            console.log(`data pt address : ${findByInstallationCode[nameArray.findIndex(search)-1].installation_address} `)
-            setNamaPT(findByInstallationCode[nameArray.findIndex(search)-1].customer_name);
-            setAlamatPT(findByInstallationCode[nameArray.findIndex(search)-1].installation_address);
+            console.log(`data pt name : ${findByInstallationCode[noInstall.findIndex(search)].customer_name}`)
+            console.log(`data pt address : ${findByInstallationCode[noInstall.findIndex(search)].installation_address} `)
+            setNamaPT(findByInstallationCode[noInstall.findIndex(search)].customer_name);
+            setAlamatPT(findByInstallationCode[noInstall.findIndex(search)].installation_address);
         })
         .catch((error) => {
         console.log(error);
@@ -104,7 +104,7 @@ const InputNoMeterScreen = ({navigation}) => {
         const priceType = {
             installation_code : `${value}`,
         }
-        fetch('http://10.1.234.163:8080/api/v1/pricetype', {
+        fetch('http://10.1.234.135:8080/api/v1/pricetype', {
             method: 'POST',
             headers : {
                 'Content-type' : 'application/json'
@@ -153,7 +153,7 @@ const InputNoMeterScreen = ({navigation}) => {
         const priceType = {
             installation_code : `${value}`,
         }
-        fetch('http://10.1.234.163:8080/api/v1/ppju', {
+        fetch('http://10.1.234.135:8080/api/v1/ppju', {
             method: 'POST',
             headers : {
                 'Content-type' : 'application/json'
