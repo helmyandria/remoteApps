@@ -41,50 +41,46 @@ function InputNoMeter({ navigation, route }) {
     );
 }
 
-var PPJU = [
-    {
-      description: '',
-      percentage: ''
-    }
-  ];
-
-const Item = ({ description, percentage }) => {
-    return (
-        <View style={{flexDirection:'row'}}>
-            <Text style={{flex : 5, fontWeight:'bold', color:'#000000'}}>{description}</Text>
-            <Text style={{flex : 2, fontWeight:'bold', color:'#000000'}}>:</Text>
-            <Text style={{flex : 5, fontWeight:'bold', color:'#000000'}}>{percentage}%</Text>
-        </View>
-    )
-};
-
 const InputNoMeterScreen = ({navigation}) => {
     const [image, setImage] = useState('https://www.arsenal.com/sites/default/files/styles/player_featured_image_1045x658/public/images/Tierney_1045x658_0.jpg?itok=mjvpH5MI');
     const [shouldShow, setShouldShow] = useState(false);
     const [containerImageNull, setContainerImageNull] = useState(true);
+    // async from no install
     const [namaPT, setNamaPT] = useState();
     const [alamatPT, setAlamatPT] = useState();
-    const [list, setList] = useState([]);
-    const [pricetype, setPriceType] = useState([]);
-    const [isLoading, setLoading] = useState(true);
-    const [listPrice, setListPrice] = useState([]);
+    // data price types
+    const [listPriceTypes, setListPriceTypes] = useState([]);
+    // data ppju
+    const [listPPJUs, setListPPJUs] = useState([]);
+    // drop down no install
     const [noInstall, setNoInstall] = useState([]);
+    // set penggunaan kwh
+    const [kwhAkhir, setKwhAkhir] = useState('');
 
-    var nameArray=[
-        {
-            value: '',
-            label: '',
-        },
-    ]
-
-    const renderPPJU = ({ item }) => (
-        <Item description={item.description} percentage={item.percentage} />
-      );
+    // constructor
+    useEffect(() => {
+        AsyncStorage.getItem('user')
+        .then((value) => {
+            const user = value ? JSON.parse(value) : [];
+            console.log(`value async : ${JSON.stringify(user)}`);
+            let userdata = [] ;
+            for (let i=0; i < user.length; i++){
+                userdata.push({
+                    value: `${user[i].installation_code}`,
+                    label: `${user[i].installation_code}`
+                });
+              }
+            setNoInstall(userdata);
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+    }, []);
 
     const onChangeHandler = (value) => {
         console.log(`installation_code selected : ${value}`);
         const search = noInstall => noInstall.label === value;
-        console.log(`index on selected : ${noInstall.findIndex(search)}`);
+        // console.log(`index on selected : ${noInstall.findIndex(search)}`);
         AsyncStorage.getItem('user')
         .then((value) => {
             const findByInstallationCode = value ? JSON.parse(value) : [];
@@ -100,11 +96,12 @@ const InputNoMeterScreen = ({navigation}) => {
         getPriceType(value);
     }
 
+    // hit API price type
     const getPriceType = (value) => {
         const priceType = {
             installation_code : `${value}`,
         }
-        fetch('http://10.1.234.135:8080/api/v1/pricetype', {
+        fetch('http://10.1.234.146:8080/api/v1/pricetype', {
             method: 'POST',
             headers : {
                 'Content-type' : 'application/json'
@@ -113,47 +110,35 @@ const InputNoMeterScreen = ({navigation}) => {
         })
         .then(response => response.json())
         .then(json => {
-            console.log(`data json value price type : ${JSON.stringify(json)}`)
-            console.log(`data json value price type : ${JSON.stringify(json.listData)}`)
-            // set result json data to array DATA
-            // DATA = [];
-            const data = value ? JSON.parse(JSON.stringify(json.listData)) : [];
-            console.log(`value data  ${data}`);
-            setListPrice(data);
-            let datam = json.listData;
-            console.log(`List Price Type ${JSON.stringify(listPrice)}`);
-            // for (let i=0; i < data.length; i++){
-            //     DATA.push({
-            //         id: data[i].id,
-            //         price_type: data[i].price_type,
-            //         price_code: data[i].price_code,
-            //         tariff: data[i].tariff,
-            //         meter_to: data[i].meter_to,
-            //     })
-            //     console.log(`price_type : ${data[i].price_type}`)
-            // }
-
-            // set result json data to array DATA
-            // const data = value ? JSON.parse(JSON.stringify(json.listData)) : [];
-            // for (let i=0; i < data.length; i++){
-            //     setPriceType({
-            //         id: data[i].id,
-            //         price_type: data[i].price_type,
-            //         price_code: data[i].price_code,
-            //         tariff: data[i].tariff,
-            //         meter_to: data[i].meter_to,
-            //     })
-            //     console.log(`price_type : ${data[i].price_type}`)
-            //     console.log(`price_code : ${data[i].price_code}`)
-            // }
+            if (json.messageCode == '00'){
+                console.log(`data json value price type : ${JSON.stringify(json)}`)
+                console.log(`data list value price type : ${JSON.stringify(json.listData)}`)
+                const data = value ? JSON.parse(JSON.stringify(json.listData)) : [];
+                console.log(`value data price type: ${data}`);
+                setListPriceTypes(data);
+            } else {
+                // show alert
+                Alert.alert(
+                    '',
+                    `${json.messageDesc}`,
+                    [
+                      {
+                        text: 'Ok',
+                        onPress: () => console.log('Ok Pressed'), style: 'cancel'
+                      },
+                    ],
+                    {cancelable: false},
+                );
+            }
         })
     }
 
+    // hit API ppju
     const getPpju = (value) => {
         const priceType = {
             installation_code : `${value}`,
         }
-        fetch('http://10.1.234.135:8080/api/v1/ppju', {
+        fetch('http://10.1.234.146:8080/api/v1/ppju', {
             method: 'POST',
             headers : {
                 'Content-type' : 'application/json'
@@ -162,145 +147,93 @@ const InputNoMeterScreen = ({navigation}) => {
         })
         .then(response => response.json())
         .then(json => {
-            console.log(`data json value ppju : ${JSON.stringify(json)}`)
-            console.log(`value list data ppju : ${JSON.stringify(json.lisData)}`)
-
-            // clear data PPJU
-            PPJU = [];
-
-            // set PPJU array to get data from json object
-            const ppju = value ? JSON.parse(JSON.stringify(json.lisData)) : [];
-            console.log(`value list data description ppju : ${ppju.map((item) => item.description)}`)
-            for (let i=0; i < ppju.length; i++){
-                PPJU.push({
-                    description: ppju[i].description,
-                    percentage: ppju[i].percentage
-                })
-                console.log(`desc : ${ppju[i].description}`)
-                console.log(`percen : ${ppju[i].percentage}`)
+            if (json.messageCode == '00'){
+                console.log(`data json value ppju : ${JSON.stringify(json)}`)
+                console.log(`data list value ppju : ${JSON.stringify(json.lisData)}`)
+                const data = value ? JSON.parse(JSON.stringify(json.lisData)) : [];
+                console.log(`value data ppju: ${data}`);
+                setListPPJUs(data);
+            } else {
+                // show alert
+                Alert.alert(
+                    '',
+                    `${json.messageDesc}`,
+                    [
+                      {
+                        text: 'Ok',
+                        onPress: () => console.log('Ok Pressed'), style: 'cancel'
+                      },
+                    ],
+                    {cancelable: false},
+                );
             }
-            // setList(`${json.lisData}`)
-            setList(JSON.stringify(json.lisData))
-            console.log(`array PPJU : ${PPJU}`)
-            console.log(`value list : ${list}`)
         })
         // .finally(() => setLoading(false));
     }
 
-    useEffect(() => {
-          AsyncStorage.getItem('user')
-          .then((value) => {
-            const user = value ? JSON.parse(value) : [];
-            console.log(`value data : ${JSON.stringify(user)}`);
-            let userdata = [] ;
-            for (let i=0; i < user.length; i++){
-                userdata.push(
-                {
-                    value: `${user[i].installation_code}`,
-                    label: `${user[i].installation_code}`
-                }
-                );
-              }
-            setNoInstall(userdata);
-
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-
-          console.log(`useEffect running`)
-    }, []);
-
-    useEffect(()=>{
-        console.log(`use Effect price type`);
-
-    }, [pricetype]);
-
-    let DATA = [
-        // {
-        //     "id": "41356",
-        //     "installation_code": "L/07791/03",
-        //     "price_type": "KVARH",
-        //     "price_code": "L49",
-        //     "tariff": "1590",
-        //     "meter_to": "11600"
-        // },
-        // {
-        //     "id": "41357",
-        //     "installation_code": "L/07791/03",
-        //     "price_type": "LWBP",
-        //     "price_code": "L47",
-        //     "tariff": "1452",
-        //     "meter_to": "230783"
-        // },
-        // {
-        //     "id": "41358",
-        //     "installation_code": "L/07791/03",
-        //     "price_type": "WBP",
-        //     "price_code": "L48",
-        //     "tariff": "2178",
-        //     "meter_to": "44234"
-        // }
-        {
-            id :'',
-            installation_code: '',
-            price_type: '',
-            price_code: '',
-            tariff: '',
-            meter_to: ''
-        }
-    ];
-
-    const listItem = ({ item }) => (
-        <Item price_type={item.price_type} meter_to={item.meter_to} price_code={item.price_code} tariff={item.tariff}/>
+    // render Price Type
+    const renderPriceType = ({ item }) => (
+        <ItemPriceType price_type={item.price_type} meter_to={item.meter_to} price_code={item.price_code} tariff={item.tariff}/>
       );
 
-    const Item = ({price_type, meter_to, price_code, tariff}) => {
+    const ItemPriceType = ({price_type, meter_to, price_code, tariff}) => {
         return (
             <View style={styles.containerInput}>
                 <View>
                     <Text style={styles.titlePriceType}>{price_type}</Text>
-                        <Text style={styles.titleH1}>KWH Awal</Text>
-                        <TextInput style={styles.textInputStyle} keyboardType={'numeric'} maxLength={10} editable={false} value={meter_to} />
-                        <Text style={styles.titleH1}>KWH Akhir</Text>
-                        <TextInput style={styles.textInputStyle} keyboardType={'numeric'} maxLength={6} onChangeText={text => setKwhAkhir(text)} value={kwhAkhir}/>
-                        <Text style={styles.titleH1}>Penggunaan</Text>
-                        <TextInput style={styles.textInputStyle} keyboardType={'numeric'} maxLength={10} editable={false} value={`${kwhAkhir-parseInt(meter_to)}`} onChangeText={text => setKwhAkhir(text)} />
-                        <Text style={styles.titleH1}>Foto No Meter</Text>
-                        <TouchableOpacity onPress={()=>
-                            {ImagePickerCamera.openCamera({
-                                        width: 300,
-                                        height: 400,
-                                        // cropping: true
-                                    }).then(image => {
-                                        console.log(image);
-                                        setImage(image.path);
-                                        console.log('Image : '+image.path)
-                                            setShouldShow(true)
-                                            setContainerImageNull(false)
-                                    });
-                            }
-                            }>
-                            {shouldShow ? (
-                                <Image
-                                    source={{uri:image}}
-                                    style={{ backgroundColor:'#000000', height: 450, width: '100%', resizeMode:'stretch'}
-                                }/>
-                            ) : null
-                            }
-                            {containerImageNull ? (
-                                <View style={styles.layoutImage}>
-                                    <MaterialCommunityIcons name="plus-circle-outline" size={50} style={styles.iconContent}/>
-                                </View>
-                            ) : null}
-
-                        </TouchableOpacity>
+                    <Text style={styles.titleH1}>KWH Awal</Text>
+                    <TextInput style={styles.textInputStyle} keyboardType={'numeric'} maxLength={10} editable={false} value={meter_to} />
+                    <Text style={styles.titleH1}>KWH Akhir</Text>
+                    <TextInput style={styles.textInputStyle} keyboardType={'numeric'} maxLength={6} onChangeText={text => setKwhAkhir(text)} value={kwhAkhir}/>
+                    <Text style={styles.titleH1}>Penggunaan</Text>
+                    <TextInput style={styles.textInputStyle} keyboardType={'numeric'} maxLength={10} editable={false} value={`${kwhAkhir-parseInt(meter_to)}`} onChangeText={text => setKwhAkhir(text)} />
+                    <Text style={styles.titleH1}>Foto No Meter</Text>
+                    <TouchableOpacity onPress={()=>
+                        {ImagePickerCamera.openCamera({
+                            width: 300,
+                            height: 400,
+                            // cropping: true
+                        }).then(image => {
+                            console.log(image);
+                            setImage(image.path);
+                            console.log('Image : '+image.path)
+                            setShouldShow(true)
+                            setContainerImageNull(false)
+                        });
+                        }
+                    }>
+                    {shouldShow ? (
+                        <Image
+                            source={{uri:image}}
+                            style={{ backgroundColor:'#000000', height: 450, width: '100%', resizeMode:'stretch'}
+                        }/>
+                    ) : null
+                    }
+                    {containerImageNull ? (
+                        <View style={styles.layoutImage}>
+                            <MaterialCommunityIcons name="plus-circle-outline" size={50} style={styles.iconContent}/>
+                        </View>
+                    ) : null}
+                    </TouchableOpacity>
                 </View>
             </View>
         )
     }
 
-    const [kwhAkhir, setKwhAkhir] = React.useState('');
+    // render PPJU
+    const renderPPJU = ({ item }) => (
+        <ItemPPJU description={item.description} percentage={item.percentage} />
+      );
+
+    const ItemPPJU = ({ description, percentage }) => {
+        return (
+            <View style={{flexDirection:'row'}}>
+                <Text style={{flex : 5, fontWeight:'bold', color:'#000000'}}>{description}</Text>
+                <Text style={{flex : 2, fontWeight:'bold', color:'#000000'}}>:</Text>
+                <Text style={{flex : 5, fontWeight:'bold', color:'#000000'}}>{percentage}%</Text>
+            </View>
+        )
+    };
 
     return (
         <View style={styles.container}>
@@ -319,7 +252,6 @@ const InputNoMeterScreen = ({navigation}) => {
                         data={noInstall}
                         disableSort
                         value={noInstall}
-                        // onChange={onChangeSS}
                         onChange={value => onChangeHandler(value)}
                     />
                     <View style={styles.divView}/>
@@ -329,36 +261,18 @@ const InputNoMeterScreen = ({navigation}) => {
                     <Text style={styles.titleH1}>Alamat</Text>
                     <Text style={styles.valueText}>{`${alamatPT}`}</Text>
                 </View>
-                    {/* data price type */}
                     <FlatList
-                            data={listPrice}
-                            // extraData={DATA}
-                            renderItem={listItem}
-                            keyExtractor={item => item.price_type}
+                        data={listPriceTypes}
+                        renderItem={renderPriceType}
+                        keyExtractor={item => item.price_type}
                     />
-                    {/* data price type */}
                 <View style={{flexDirection:'row', backgroundColor: '#F2F2F2', marginLeft:25, marginRight:25, padding:20, borderRadius:8}}>
-                    {/* list PPJU */}
-                    {/* <FlatList
-                        data={list}
+                    <FlatList
+                        data={listPPJUs}
                         renderItem={renderPPJU}
                         keyExtractor={item => item.id}
-                        extraData={list}
-                        refreshing={list}
-                    /> */}
-                    {/* {list.map(lisData => {
-                        return <Item description={'t'} percentage={'s'}/>
-                    })} */}
-                    {/* {list.map(value => {console.log(`mapping list`)})} */}
-                    {/* {Object.entries(list).map(([key, value]) => {return console.log('object entries list'), <Text>{value}</Text>}, )} */}
-                    {Object.entries(PPJU).map(([key, value]) => {return  <Text>{value.description} : <Text>{value.percentage} %</Text></Text>}, )}
-                    {/* {Object.entries(list).map(([key, value]) => {console.log(`mapping : ${value}`)})} */}
-                    {console.log(`ppju data : ${PPJU}`)}
-                    {console.log(`list length : ${list.length}`)}
-                    {console.log(`list description : ${list.description}`)}
-                    {console.log(`isinya list di tampilan : ${list}`)}
-                    {console.log(`get data from array : ${JSON.stringify(list.description)}`)}
-                    {/* list PPJU */}
+                    />
+                    {/* {Object.entries(PPJU).map(([key, value]) => {return  <Text>{value.description} : <Text>{value.percentage} %</Text></Text>}, )} */}
                 </View>
                 <View style={{flexDirection:'row'}}>
                     <TouchableOpacity
@@ -371,7 +285,6 @@ const InputNoMeterScreen = ({navigation}) => {
                     <TouchableOpacity
                         style={styles.postButtonStyle} onPress={
                             () =>
-                            //  {Alert.alert('You tapped button posting');}
                              {navigation.navigate('LaporanInputNoMeter')}
                         }>
                     <Text style={styles.titleButtonStyle}> POSTING </Text>

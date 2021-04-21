@@ -1,11 +1,12 @@
 import React,  { useState, useEffect } from 'react'
-import { FlatList, StyleSheet, Picker, Text, View, Image, TouchableOpacity, StatusBar, Button } from 'react-native'
+import { FlatList, StyleSheet, Text, View, TouchableOpacity, StatusBar } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Dropdown } from 'sharingan-rn-modal-dropdown';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-  export const month = [
+// dropdown list month
+export const month = [
     {
         value: '01',
         label: 'Januari',
@@ -54,9 +55,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
         value: '12',
         label: 'Desember',
     },
-  ];
+];
 
-  export const year = [
+// dropdown list year
+export const year = [
     {
         value: '2015',
         label: '2015',
@@ -97,7 +99,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
         value: '2024',
         label: '2024',
     },
-    ];
+];
 
 const MyStatusBar = ({backgroundColor, ...props}) => (
     <View style={[styles.statusBar, { backgroundColor, height: 24 }]}>
@@ -105,105 +107,23 @@ const MyStatusBar = ({backgroundColor, ...props}) => (
     </View>
   );
 
-const Item = ({price_type, meter_from, meter_to, tariff}) => {
-    return (
-        <View>
-            <View style={styles.containerInfoUser}>
-                <View style={{flexDirection:'row', alignContent:'center', alignSelf:'center', justifyContent:'center', width:'100%'}}>
-                    <Text style={{flex:1, textAlign:'center', marginBottom:10, fontWeight:'bold', color:'#000000'}}>KWH Awal</Text>
-                    <Text style={{flex:1, textAlign:'center', marginBottom:10, fontWeight:'bold', color:'#000000'}}>KWH Akhir</Text>
-                    <Text style={{flex:1, textAlign:'center', marginBottom:10, fontWeight:'bold', color:'#000000'}}>Penggunaan</Text>
-                </View>
-                <View style={{flexDirection:'row',alignContent:'center', alignSelf:'center', justifyContent:'center'}}>
-                    <Text style={{flex:1, textAlign:'center', color:'#ffffff', fontWeight:'bold',}}>{meter_from}</Text>
-                    <Text style={{flex:1, textAlign:'center', color:'#ffffff', fontWeight:'bold',}}>{meter_to}</Text>
-                    <Text style={{flex:1, textAlign:'center', color:'#ffffff', fontWeight:'bold',}}>-</Text>
-                </View>
-
-                <View style={styles.divView}/>
-                    <Text style={styles.titleH1}>KWH {price_type}</Text>
-                    <Text style={styles.valueText}>xxxx Kwh</Text>
-                    <View style={styles.divView}/>
-                    <Text style={styles.titleH1}>Biaya KWH {price_type}</Text>
-                    <Text style={styles.valueText}>Rp {tariff}</Text>
-            </View>
-            <View style={styles.divView}/>
-        </View>
-    )
-}
-
 const LaporanTagihan = ({navigation}) => {
+    // data tagihan
     const [listTagihans, setlistTagihans] = useState([]);
-    const [valueSS, setValueSS] = useState('');
+    // async from no install
     const [namaPT, setNamaPT] = useState();
     const [alamatPT, setAlamatPT] = useState();
     const [noInstallasi, setNoInstallasi] = useState();
+    // data dropdown no installasi
     const [dNoInstallasi, setdNoInstallasi] = useState();
+    // data param dropdown no installasi
     const [paramNoInstall, setParamNoInstall] = useState('');
+    // month DD
+    const [monthDD, setMonthDD] = useState();
+    // year DD
+    const [yearDD, setYearDD] = useState();
 
-    const onChangeSS = (value) => {
-        setValueSS(value);
-    };
-    // variable
-    let var1='zoro';
-    let var2='tes var 2';
-    let bulan='';
-    let tahun='';
-    let textValue='';
-    let noInstall = '';
-
-     // object data post tagihan
-     const [dataTagihan, setDataTagihan] = useState({
-        messageCode: '',
-        messageDesc : ''
-    })
-    // hit api with post data tagihan
-    const postDataTagihan = (installation_code) => {
-        const dataForAPITagihan = {
-                period : `${bulan}.${tahun}`,
-                installation_code : `${paramNoInstall}`
-        }
-        fetch('http://10.1.234.135:8080/api/v1/taglistrik', {
-            method: 'POST',
-            headers : {
-                'Content-type' : 'application/json'
-            },
-            body : JSON.stringify(dataForAPITagihan)
-        })
-        .then(response => response.json())
-        .then(json => {
-            // setDataTagihan(json)
-            console.log(`data json : ${JSON.stringify(json)}`)
-            // console.log(`data object list : ${JSON.stringify(json.listTagihanListrik)}`)
-            // DATA1.push(JSON.stringify(json.listTagihanListrik))
-            // console.log(`data from array : ${DATA1}`)
-
-            const data = installation_code ? JSON.parse(JSON.stringify(json.listTagihanListrik)) : [];
-            console.log(`post data tagihan value : ${data}`);
-            setlistTagihans(data)
-        })
-    }
-
-    const onChangeHandler = (value) => {
-        // console.log(`Selected value: ${value}`);
-        // console.log(`Log var 1: ${var1}`);
-        var1 = `${value}`;
-        // var2 = `${value}`;
-        bulan = `${value}`;
-        // tahun = `${value}`;
-        // console.log(`Log var 1 after update: ${var1}`);
-        console.log(`bulan : ${bulan}`);
-        // console.log(`tahun : ${tahun}`);
-    }
-
-    const onChangeHandlerTahun = (value) => {
-        tahun = `${value}`;
-        console.log(`tahun : ${tahun}`);
-    }
-
-    useEffect(() => {
-    }, [])
-
+    // constructor
     useEffect(() => {
         AsyncStorage.getItem('user')
         .then((value) => {
@@ -224,19 +144,15 @@ const LaporanTagihan = ({navigation}) => {
         .catch((error) => {
           console.log(error);
         });
-
         console.log(`useEffect running`)
-  }, []);
+    }, []);
 
+    //   handler no installasi
     const onChangeHandlerNoInstallasi = (value) => {
-        noInstall = `${value}`;
         setParamNoInstall(`${value}`)
-        console.log(`isi var no install : ${noInstall}`);
         console.log(`installation_code selected : ${value}`);
-        // const search = nameArray => nameArray.label === value;
         const search = dNoInstallasi => dNoInstallasi.label === value;
-        // console.log(`index on selected : ${nameArray.findIndex(search)-1}`);
-        console.log(`index on selected : ${dNoInstallasi.findIndex(search)-1}`);
+        console.log(`index on selected : ${dNoInstallasi.findIndex(search)}`);
         AsyncStorage.getItem('user')
         .then((value) => {
             const findByInstallationCode = value ? JSON.parse(value) : [];
@@ -251,54 +167,71 @@ const LaporanTagihan = ({navigation}) => {
         });
     }
 
-    const DATA = [
-        {
-            "price_type": "KVARH",
-            "meter_to": "27547",
-            "meter_from": "27547",
-            "ppju": "5",
-            "tariff": "1590",
-            "amount": "15367968",
-            "period": "03.2017",
-            "installation_code": "L/07791/03",
-            "id": 43002355
-        },
-        {
-            "price_type": "LWBP",
-            "meter_to": "5615",
-            "meter_from": "5447",
-            "ppju": "5",
-            "tariff": "1452",
-            "amount": "15367968",
-            "period": "03.2017",
-            "installation_code": "L/07791/03",
-            "id": 43002355
-        },
-        {
-            "price_type": "WBP",
-            "meter_to": "2358",
-            "meter_from": "2358",
-            "ppju": "5",
-            "tariff": "2178",
-            "amount": "15367968",
-            "period": "03.2017",
-            "installation_code": "L/07791/03",
-            "id": 43002355
+    // handler month
+    const onChangeHandlerBulan = (value) => {
+        setMonthDD(`${value}`);
+        console.log(`value month : ${value}`)
+    }
+
+    // handler year
+    const onChangeHandlerTahun = (value) => {
+        setYearDD(`${value}`)
+        console.log(`value year : ${value}`);
+    }
+
+    // hit api with post data tagihan
+    const postDataTagihan = (installation_code) => {
+        console.log(`setMonth DD : ${monthDD}`);
+        const dataForAPITagihan = {
+                period : `${monthDD}.${yearDD}`,
+                installation_code : `${paramNoInstall}`
         }
-    ];
+        fetch('http://10.1.234.146:8080/api/v1/taglistrik', {
+            method: 'POST',
+            headers : {
+                'Content-type' : 'application/json'
+            },
+            body : JSON.stringify(dataForAPITagihan)
+        })
+        .then(response => response.json())
+        .then(json => {
+            console.log(`data json : ${JSON.stringify(json)}`);
+            const data = installation_code ? JSON.parse(JSON.stringify(json.listTagihanListrik)) : [];
+            console.log(`post data tagihan value : ${data}`);
+            setlistTagihans(data)
+        })
+    }
 
-    const DATA1 = []
+    // render data tagihan
+    const renderPriceTypes = ({ item }) => (
+        <ItemPriceTypes price_type={item.price_type} meter_from={item.meter_from} meter_to={item.meter_to} tariff={item.tariff}/>
+    );
 
-    const renderItem = ({ item }) => (
-        <Item price_type={item.price_type} meter_from={item.meter_from} meter_to={item.meter_to} tariff={item.tariff}/>
-      );
-
-    var nameArray=[
-        {
-            value: '',
-            label: '',
-        },
-    ]
+    const ItemPriceTypes = ({price_type, meter_from, meter_to, tariff}) => {
+        return (
+            <View>
+                <View style={styles.containerInfoUser}>
+                    <View style={{flexDirection:'row', alignContent:'center', alignSelf:'center', justifyContent:'center', width:'100%'}}>
+                        <Text style={{flex:1, textAlign:'center', marginBottom:10, fontWeight:'bold', color:'#000000'}}>KWH Awal</Text>
+                        <Text style={{flex:1, textAlign:'center', marginBottom:10, fontWeight:'bold', color:'#000000'}}>KWH Akhir</Text>
+                        <Text style={{flex:1, textAlign:'center', marginBottom:10, fontWeight:'bold', color:'#000000'}}>Penggunaan</Text>
+                    </View>
+                    <View style={{flexDirection:'row',alignContent:'center', alignSelf:'center', justifyContent:'center'}}>
+                        <Text style={{flex:1, textAlign:'center', color:'#ffffff', fontWeight:'bold',}}>{meter_from}</Text>
+                        <Text style={{flex:1, textAlign:'center', color:'#ffffff', fontWeight:'bold',}}>{meter_to}</Text>
+                        <Text style={{flex:1, textAlign:'center', color:'#ffffff', fontWeight:'bold',}}>-</Text>
+                    </View>
+                    <View style={styles.divView}/>
+                        <Text style={styles.titleH1}>KWH {price_type}</Text>
+                        <Text style={styles.valueText}>xxxx Kwh</Text>
+                        <View style={styles.divView}/>
+                        <Text style={styles.titleH1}>Biaya KWH {price_type}</Text>
+                        <Text style={styles.valueText}>Rp {tariff}</Text>
+                </View>
+                <View style={styles.divView}/>
+            </View>
+        )
+    }
 
     return (
         <View style={styles.container}>
@@ -317,7 +250,6 @@ const LaporanTagihan = ({navigation}) => {
                             data={dNoInstallasi}
                             disableSort
                             value={dNoInstallasi}
-                            // onChange={onChangeSS}
                             onChange={value => onChangeHandlerNoInstallasi(value)}
                         />
                     </View>
@@ -326,51 +258,17 @@ const LaporanTagihan = ({navigation}) => {
                             label="Bulan"
                             data={month}
                             disableSort
-                            value={valueSS}
-                            // onChange={onChangeSS}
-                            onChange={value => onChangeHandler(value)}
+                            value={month}
+                            onChange={value => onChangeHandlerBulan(value)}
                         />
                         <Dropdown
                             label="Tahun"
                             data={year}
-                            value={valueSS}
-                            // onChange={onChangeSS}
+                            value={year}
                             onChange={value => onChangeHandlerTahun(value)}
                         />
                     </View>
                     <View>
-                        {/* <TouchableOpacity
-                            style={{marginTop:20,
-                                marginBottom:20,
-                                paddingTop:15,
-                                paddingBottom:15,
-                                backgroundColor:'#0984e3',
-                                borderRadius:10,
-                                borderWidth: 1,
-                                marginLeft: 25,
-                                marginRight:25,
-                                borderColor: '#fff',}} onPress={
-                                () =>
-                                {getData()}
-                            }>
-                        <Text style={{color:'#fff', textAlign:'center',}}> Cari with method get </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={{marginTop:20,
-                                marginBottom:20,
-                                paddingTop:15,
-                                paddingBottom:15,
-                                backgroundColor:'#0984e3',
-                                borderRadius:10,
-                                borderWidth: 1,
-                                marginLeft: 25,
-                                marginRight:25,
-                                borderColor: '#fff',}} onPress={
-                                () =>
-                                {postData()}
-                            }>
-                        <Text style={{color:'#fff', textAlign:'center',}}> Cari with mehod post </Text>
-                        </TouchableOpacity> */}
                         <TouchableOpacity
                             style={{marginTop:20,
                                 marginBottom:20,
@@ -390,20 +288,12 @@ const LaporanTagihan = ({navigation}) => {
                     </View>
                     <View style={styles.containerTitle}>
                         <Text style={styles.titleTagihan}>Tagihan Listrik</Text>
-                        <Text style={styles.dataBulan}>{textValue}</Text>
+                        <Text style={styles.dataBulan}></Text>
                         <View style={styles.containerInfoUser}>
                             <Text style={styles.titleH1}>Nama</Text>
-                            {/* <Text style={styles.valueText}>PT BERKAH INDUSTRI MESIN ANGKAT</Text> */}
-                            {/* <Text style={styles.valueText}>{`${dataUser.first_name} ${dataUser.last_name}`}</Text>
-                            <Text style={styles.valueText}>{`${dataJob.name}`}</Text> */}
-                            {/* <Text style={styles.valueText}>{`${dataTagihan.messageCode}`}</Text> */}
                             <Text style={styles.valueText}>{`${namaPT}`}</Text>
                             <View style={styles.divView}/>
                             <Text style={styles.titleH1}>Alamat</Text>
-                            {/* <Text style={styles.valueText}>JL.PRAPAT KURUNG UTARA 58 RT.002 RW.003 PERAK UTARA</Text> */}
-                            {/* <Text style={styles.valueText}>{`${dataUser.email}`}</Text>
-                            <Text style={styles.valueText}>{`${dataJob.job}`}</Text> */}
-                            {/* <Text style={styles.valueText}>{`${dataTagihan.messageDesc}`}</Text> */}
                             <Text style={styles.valueText}>{`${alamatPT}`}</Text>
                             <View style={styles.divView}/>
                             <Text style={styles.titleH1}>No Installasi</Text>
@@ -411,77 +301,12 @@ const LaporanTagihan = ({navigation}) => {
                             <View style={styles.divView}/>
                         </View>
                         <View style={styles.divView}/>
-                        {/* {listTagihans.map(listTagihanListrik => {
-                            return <Item price_type={listTagihanListrik.price_type} meter_from={listTagihanListrik.meter_from} meter_to={listTagihanListrik.meter_to} tariff={listTagihanListrik.tariff}/>
-                        })} */}
                         <FlatList
                             data={listTagihans}
-                            // extraData={listTagihans}
-                            renderItem={renderItem}
+                            renderItem={renderPriceTypes}
                             keyExtractor={item => item.price_type}
-                            // refreshing={true}
                         />
-
-                        {/* <View style={styles.containerInfoUser}>
-                            <View style={{flexDirection:'row', alignContent:'center', alignSelf:'center', justifyContent:'center', width:'100%'}}>
-                                <Text style={{flex:1, textAlign:'center', marginBottom:10, fontWeight:'bold', color:'#000000'}}>KWH Awal</Text>
-                                <Text style={{flex:1, textAlign:'center', marginBottom:10, fontWeight:'bold', color:'#000000'}}>KWH Akhir</Text>
-                                <Text style={{flex:1, textAlign:'center', marginBottom:10, fontWeight:'bold', color:'#000000'}}>Penggunaan</Text>
-                            </View>
-                            <View style={{flexDirection:'row',alignContent:'center', alignSelf:'center', justifyContent:'center'}}>
-                                <Text style={{flex:1, textAlign:'center', color:'#ffffff', fontWeight:'bold',}}>2820</Text>
-                                <Text style={{flex:1, textAlign:'center', color:'#ffffff', fontWeight:'bold',}}>2900</Text>
-                                <Text style={{flex:1, textAlign:'center', color:'#ffffff', fontWeight:'bold',}}>80</Text>
-                            </View>
-
-                            <View style={styles.divView}/>
-
-                            <Text style={styles.titleH1}>KWH WBP</Text>
-                            <Text style={styles.valueText}>xxxx Kwh</Text>
-
-                            <View style={styles.divView}/>
-
-                            <Text style={styles.titleH1}>Biaya KWH WBP</Text>
-                            <Text style={styles.valueText}>Rp xxxxx</Text>
-                        </View> */}
                         <View style={styles.divView}/>
-
-                        {/* <View style={styles.containerInfoUser}> */}
-                            {/* <Text style={styles.titleH1}>KWH WBP</Text>
-                            <Text style={styles.valueText}>xxxx Kwh</Text>
-
-                            <View style={styles.divView}/>
-
-                            <Text style={styles.titleH1}>Biaya KWH WBP</Text>
-                            <Text style={styles.valueText}>Rp xxxxx</Text>
-
-                            <View style={styles.divView}/> */}
-
-                            {/* <Text style={styles.titleH1}>KWH LWBP</Text>
-                            <Text style={styles.valueText}>xxxx Kwh</Text>
-
-                            <View style={styles.divView}/>
-
-                            <Text style={styles.titleH1}>Biaya KWH LWBP</Text>
-                            <Text style={styles.valueText}>Rp xxxxx</Text>
-
-                            <View style={styles.divView}/>
-
-                            <Text style={styles.titleH1}>kVARH</Text>
-                            <Text style={styles.valueText}>xxxx Kwh</Text>
-
-                            <View style={styles.divView}/>
-
-                            <Text style={styles.titleH1}>Biaya Denda kVARH</Text>
-                            <Text style={styles.valueText}>xxxx</Text>
-
-                            <View style={styles.divView}/> */}
-
-                            {/* <Text style={styles.titleH1}>PPJU</Text>
-                            <Text style={styles.valueText}>x %</Text> */}
-
-                        {/* </View> */}
-
                         <View style={{flexDirection:'row', backgroundColor:'#42d17f', borderRadius:8, padding:20, marginTop:10,}}>
                             <Text style={{textAlign:'left', flex:5, color:'#000000', fontSize:18, fontWeight:'bold'}}>TOTAL</Text>
                             <Text style={{textAlign:'right', flex:5, color:'#e84118', fontSize:18, fontWeight:'bold'}}>Rp 2.000.000,-</Text>

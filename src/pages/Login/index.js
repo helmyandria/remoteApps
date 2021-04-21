@@ -1,4 +1,4 @@
-import React, { Component, useState } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, View, Image, TouchableOpacity, Alert, Button, StatusBar, ToastAndroid} from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
@@ -29,89 +29,9 @@ function Login() {
 
 const Stack = createStackNavigator();
 
-// class LoginScreen extends Component {
-//     constructor(props){
-//         super(props);
-//     }
-
-//     componentDidMount(){
-
-//     }
-
-//     render() {
-//         return (
-//         <View style={styles.container}>
-//             <MyStatusBar backgroundColor="#1d6ea4" barStyle="light-content" />
-//             <View style={styles.containerMainLogin}>
-//                 <View style={styles.containerLogin}>
-//                     <Image source={logoRemote} style={styles.imageStyle}/>
-//                     <View>
-//                         {/* <View style={{flexDirection:'row'}}>
-//                             <MaterialCommunityIcons name="account" size={30} style={styles.iconHeader}/>
-//                             <TextInput style={styles.textInputStyle} placeholder='Masukkan Username'/>
-//                         </View> */}
-//                         <View style={{flexDirection:'row', alignItems:'center', paddingVertical:15, marginTop:20}}>
-//                             <MaterialCommunityIcons name="account" size={30} style={{marginRight:5, color:'#000000', flex:1}}/>
-//                             <TextInput style={styles.textInputStyle} placeholder='Masukkan Username Anda' maxLength={15}
-//                             // onChangeText={text => setUsernameValue(text)} value={usernameValue}
-//                             />
-//                         </View>
-//                         <View style={{flexDirection:'row', alignItems:'center', paddingVertical:15}}>
-//                             <MaterialCommunityIcons name="lock" size={30} style={{marginRight:5, color:'#000000', flex:1}}/>
-//                             <TextInput style={styles.textInputStyle} placeholder='Masukkan Password' maxLength={15} secureTextEntry={true}
-//                             // onChangeText={text => setPassValue(text)} value={passValue}
-//                             />
-//                         </View>
-//                         {/* <Text style={styles.textStyleTitle}>Password</Text>
-//                         <TextInput style={styles.textInputStyle} placeholder='Masukkan Password'/> */}
-//                         <TouchableOpacity
-//                             style={styles.submitButtonStyleLogin} onPress={
-//                                 () =>
-//                                 // {Alert.alert('You tapped button Login');}
-//                                 // navigation.navigate('MainMenu')
-//                                 {
-//                                     // Alert.alert(`Username : ${usernameValue} \nPassword : ${passValue}`)
-//                                     // Alert.alert(
-//                                     //     'LOGIN',
-//                                     //     `Username : ${usernameValue} \nPassword : ${passValue}`,
-//                                     //     [
-//                                     //     //   {text: 'Cancel', onPress: () => console.log('Cancel Pressed!')},
-//                                     //       {text: 'OK', onPress: () => {
-//                                     //           navigation.navigate('MainMenu'), setUsernameValue(''), setPassValue('')
-//                                     //         }
-//                                     //         },
-//                                     //     ],
-//                                     //     { cancelable: false }
-//                                     //   )
-//                                     // console.log(`Log input: ${usernameValue} ${passValue}`)
-//                                     // console.log(`username :  ${usernameValue}`)
-//                                     // console.log(`pass :  ${passValue}`)
-//                                     // postLogin()
-//                                 }
-//                             }>
-//                         <Text style={styles.textStyleButton}> LOGIN </Text>
-//                         </TouchableOpacity>
-//                         {/* <View style={styles.separator}></View>
-//                         <TouchableOpacity
-//                             style={styles.submitButtonStyleRegister} onPress={
-//                                 () =>
-//                                 // {Alert.alert('You tapped button Register');}
-//                                 navigation.navigate('Register')
-//                             }>
-//                         <Text style={styles.textStyleButton}>REGISTER</Text>
-//                         </TouchableOpacity> */}
-//                     </View>
-//                 </View>
-//                 <Image source={logoPelindo} style={styles.imageStylePelindo}/>
-//             </View>
-//         </View>
-//         );
-//       }
-// }
-
 function LoginScreen({navigation}) {
-    const [usernameValue, setUsernameValue] = React.useState('');
-    const [passValue, setPassValue] = React.useState('');
+    const [usernameValue, setUsernameValue] = useState('');
+    const [passValue, setPassValue] = useState('');
 
     const [dataLogin, setDataLogin] = useState({
         messageCode: '',
@@ -123,7 +43,7 @@ function LoginScreen({navigation}) {
                 username : `${usernameValue}`,
                 password : `${passValue}`
         }
-        fetch('http://10.1.234.135:8080/api/v1/akun', {
+        fetch('http://10.1.234.146:8080/api/v1/akun', {
             method: 'POST',
             headers : {
                 'Content-type' : 'application/json'
@@ -140,6 +60,7 @@ function LoginScreen({navigation}) {
                 console.log(`data login message ${dataLogin.messageCode}`)
                 console.log(`data login message ${dataLogin.messageDesc}`)
                 console.log(`data object list : ${JSON.stringify(json.listData)}`)
+                // set data to async
                 AsyncStorage.setItem('user', JSON.stringify(json.listData))
                 .then(() => {
                     console.log('data saved on asyncstorage');
@@ -147,6 +68,7 @@ function LoginScreen({navigation}) {
                 .catch((error) => {
                     console.log(error);
                 });
+                // show alert
                 Alert.alert(
                     'LOGIN BERHASIL',
                     `Selamat datang ${usernameValue} `,
@@ -163,6 +85,7 @@ function LoginScreen({navigation}) {
                 console.log('Data not valid')
                 console.log(`data login message ${dataLogin.messageCode}`)
                 console.log(`data login message ${dataLogin.messageDesc}`)
+                // show toast
                 if (Platform.OS === 'android') {
                     ToastAndroid.show('Periksa username / password Anda', ToastAndroid.SHORT)
                 } else {
@@ -180,10 +103,6 @@ function LoginScreen({navigation}) {
                 <View style={styles.containerLogin}>
                     <Image source={logoRemote} style={styles.imageStyle}/>
                     <View>
-                        {/* <View style={{flexDirection:'row'}}>
-                            <MaterialCommunityIcons name="account" size={30} style={styles.iconHeader}/>
-                            <TextInput style={styles.textInputStyle} placeholder='Masukkan Username'/>
-                        </View> */}
                         <View style={{flexDirection:'row', alignItems:'center', paddingVertical:15, marginTop:20}}>
                             <MaterialCommunityIcons name="account" size={30} style={{marginRight:5, color:'#000000', flex:1}}/>
                             <TextInput style={styles.textInputStyle} placeholder='Masukkan Username' maxLength={15}
@@ -194,28 +113,9 @@ function LoginScreen({navigation}) {
                             <TextInput style={styles.textInputStyle} placeholder='Masukkan Password' maxLength={15} secureTextEntry={true}
                             onChangeText={text => setPassValue(text)} value={passValue}/>
                         </View>
-                        {/* <Text style={styles.textStyleTitle}>Password</Text>
-                        <TextInput style={styles.textInputStyle} placeholder='Masukkan Password'/> */}
                         <TouchableOpacity
                             style={styles.submitButtonStyleLogin} onPress={
-                                () =>
-                                // {Alert.alert('You tapped button Login');}
-                                // navigation.navigate('MainMenu')
-                                {
-                                    // Alert.alert(`Username : ${usernameValue} \nPassword : ${passValue}`)
-                                    // Alert.alert(
-                                    //     'LOGIN',
-                                    //     `Username : ${usernameValue} \nPassword : ${passValue}`,
-                                    //     [
-                                    //     //   {text: 'Cancel', onPress: () => console.log('Cancel Pressed!')},
-                                    //       {text: 'OK', onPress: () => {
-                                    //           navigation.navigate('MainMenu'), setUsernameValue(''), setPassValue('')
-                                    //         }
-                                    //         },
-                                    //     ],
-                                    //     { cancelable: false }
-                                    //   )
-                                    // console.log(`Log input: ${usernameValue} ${passValue}`)
+                                () => {
                                     console.log(`username :  ${usernameValue}`)
                                     console.log(`pass :  ${passValue}`)
                                     postLogin()
@@ -223,6 +123,7 @@ function LoginScreen({navigation}) {
                             }>
                         <Text style={styles.textStyleButton}> LOGIN </Text>
                         </TouchableOpacity>
+                        {/* Button register */}
                         {/* <View style={styles.separator}></View>
                         <TouchableOpacity
                             style={styles.submitButtonStyleRegister} onPress={
