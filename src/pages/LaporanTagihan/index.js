@@ -186,7 +186,7 @@ const LaporanTagihan = ({navigation}) => {
                 period : `${monthDD}.${yearDD}`,
                 installation_code : `${paramNoInstall}`
         }
-        fetch('http://10.1.234.146:8080/api/v1/taglistrik', {
+        fetch('http://10.1.234.74:8080/api/v1/taglistrik', {
             method: 'POST',
             headers : {
                 'Content-type' : 'application/json'

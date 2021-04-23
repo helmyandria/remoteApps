@@ -11,6 +11,8 @@ import LaporanInputNoMeter from '../LaporanInputNoMeter';
 import { Dropdown } from 'sharingan-rn-modal-dropdown';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+var _ = require('lodash');
+
 const MyStatusBar = ({backgroundColor, ...props}) => (
     <View style={[styles.statusBar, { backgroundColor, height: 24 }]}>
       <StatusBar translucent backgroundColor={backgroundColor} {...props} />
@@ -55,7 +57,7 @@ const InputNoMeterScreen = ({navigation}) => {
     // drop down no install
     const [noInstall, setNoInstall] = useState([]);
     // set penggunaan kwh
-    const [kwhAkhir, setKwhAkhir] = useState('');
+    const [_kwhAkhir, _setKwhAkhir] = useState('');
 
     // constructor
     useEffect(() => {
@@ -101,7 +103,7 @@ const InputNoMeterScreen = ({navigation}) => {
         const priceType = {
             installation_code : `${value}`,
         }
-        fetch('http://10.1.234.146:8080/api/v1/pricetype', {
+        fetch('http://10.1.234.74:8080/api/v1/pricetype', {
             method: 'POST',
             headers : {
                 'Content-type' : 'application/json'
@@ -138,7 +140,7 @@ const InputNoMeterScreen = ({navigation}) => {
         const priceType = {
             installation_code : `${value}`,
         }
-        fetch('http://10.1.234.146:8080/api/v1/ppju', {
+        fetch('http://10.1.234.74:8080/api/v1/ppju', {
             method: 'POST',
             headers : {
                 'Content-type' : 'application/json'
@@ -172,11 +174,11 @@ const InputNoMeterScreen = ({navigation}) => {
     }
 
     // render Price Type
-    const renderPriceType = ({ item }) => (
-        <ItemPriceType price_type={item.price_type} meter_to={item.meter_to} price_code={item.price_code} tariff={item.tariff}/>
+    const _renderPriceType = ({ item }) => (
+        <_ItemPriceType price_type={item.price_type} meter_to={item.meter_to} price_code={item.price_code} tariff={item.tariff}/>
       );
 
-    const ItemPriceType = ({price_type, meter_to, price_code, tariff}) => {
+    const _ItemPriceType = ({price_type, meter_to, price_code, tariff}) => {
         return (
             <View style={styles.containerInput}>
                 <View>
@@ -184,9 +186,9 @@ const InputNoMeterScreen = ({navigation}) => {
                     <Text style={styles.titleH1}>KWH Awal</Text>
                     <TextInput style={styles.textInputStyle} keyboardType={'numeric'} maxLength={10} editable={false} value={meter_to} />
                     <Text style={styles.titleH1}>KWH Akhir</Text>
-                    <TextInput style={styles.textInputStyle} keyboardType={'numeric'} maxLength={6} onChangeText={text => setKwhAkhir(text)} value={kwhAkhir}/>
+                    <TextInput style={styles.textInputStyle} keyboardType={'numeric'} maxLength={6} onChangeText={text => _setKwhAkhir(text)} value={_kwhAkhir}/>
                     <Text style={styles.titleH1}>Penggunaan</Text>
-                    <TextInput style={styles.textInputStyle} keyboardType={'numeric'} maxLength={10} editable={false} value={`${kwhAkhir-parseInt(meter_to)}`} onChangeText={text => setKwhAkhir(text)} />
+                    <TextInput style={styles.textInputStyle} keyboardType={'numeric'} maxLength={10} editable={false} value={`${_kwhAkhir-parseInt(meter_to)}`} onChangeText={text => _setKwhAkhir(text)} />
                     <Text style={styles.titleH1}>Foto No Meter</Text>
                     <TouchableOpacity onPress={()=>
                         {ImagePickerCamera.openCamera({
@@ -263,7 +265,7 @@ const InputNoMeterScreen = ({navigation}) => {
                 </View>
                     <FlatList
                         data={listPriceTypes}
-                        renderItem={renderPriceType}
+                        renderItem={_renderPriceType}
                         keyExtractor={item => item.price_type}
                     />
                 <View style={{flexDirection:'row', backgroundColor: '#F2F2F2', marginLeft:25, marginRight:25, padding:20, borderRadius:8}}>
@@ -274,7 +276,26 @@ const InputNoMeterScreen = ({navigation}) => {
                     />
                     {/* {Object.entries(PPJU).map(([key, value]) => {return  <Text>{value.description} : <Text>{value.percentage} %</Text></Text>}, )} */}
                 </View>
-                <View style={{flexDirection:'row'}}>
+                <View style={{flexDirection:'column', backgroundColor: '#F2F2F2', marginLeft:25, marginRight:25, marginTop:20, marginBottom: 20, padding:20, borderRadius:8}}>
+                    <Text style={{fontWeight:'bold'}}>Keterangan</Text>
+                    <TextInput
+                        multiline={true}
+                        numberOfLines={3}
+                        backgroundColor='#f2f2f2f2'
+                        placeholder="Isikan Keterangan..."
+                        style={styles.ketStyle}/>
+                </View>
+                <View style={{flexDirection:'column', backgroundColor: '#F2F2F2', marginLeft:25, marginRight:25, padding:20, borderRadius:8}}>
+                    <TouchableOpacity
+                        style={styles.calculateButtonStyle} onPress={
+                            () =>
+                             {Alert.alert('You tapped calculate');}
+                        }>
+                        <Text style={styles.titleButtonStyle}> CALCULATE </Text>
+                    </TouchableOpacity>
+                    <Text style={styles.titleTotal}>8.000.000</Text>
+                </View>
+                <View style={{flexDirection:'row', marginBottom:50, marginTop:20}}>
                     <TouchableOpacity
                         style={styles.draftButtonStyle} onPress={
                             () =>
@@ -420,4 +441,26 @@ const styles = StyleSheet.create({
         color:'#fff',
         textAlign:'center',
     },
+    calculateButtonStyle : {
+        backgroundColor:'#e74c3c',
+        paddingTop:15,
+        paddingBottom:15,
+        borderRadius:10,
+        borderWidth: 1,
+        borderColor: '#fff',
+        marginBottom: 20,
+        flex:1,
+    },
+    ketStyle : {
+        textAlignVertical: "top",
+        borderRadius:10,
+        backgroundColor:'#dfe6e9',
+        borderColor:'#000000',
+        borderWidth:1,
+        marginTop:10,
+    },
+    titleTotal : {
+        textAlign:'center',
+        fontWeight:'bold'
+    }
 })

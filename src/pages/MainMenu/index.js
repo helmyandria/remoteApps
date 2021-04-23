@@ -65,19 +65,21 @@ const retrieveData = () => {
 
 const navigationHome = () =>{
   return (
-    <Stack.Navigator initialRouteName="MainMenu">
-      <Stack.Screen name="MainMenu" component={MainMenu} options={{ headerShown: false }} />
-      <Stack.Screen name="MenuListrik" component={MenuListrik} options={{ headerShown: false }} />
-      <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="LaporanTagihan" component={LaporanTagihan} options={{ headerShown: false }} />
-      <Stack.Screen name="InputNoMeter" component={InputNoMeter} options={{ headerShown: false }} />
-      <Stack.Screen name="TambahTagihan" component={TambahTagihan} options={{ headerShown: false }} />
-      <Stack.Screen name="UbahProfile" component={UbahProfile} options={{ headerShown: false }} />
-      <Stack.Screen name="UbahPass" component={UbahPassword} options={{ headerShown: false }} />
-      <Stack.Screen name="Pengaduan" component={Pengaduan} options={{ headerShown: false }} />
-      <Stack.Screen name="PusatBantuan" component={PusatBantuan} options={{ headerShown: false }} />
-      <Stack.Screen name="TentangAplikasi" component={TentangAplikasi} options={{ headerShown: false }} />
-  </Stack.Navigator>
+    // <NavigationContainer>
+      <Stack.Navigator initialRouteName="MainMenu">
+        <Stack.Screen name="MainMenu" component={MainMenu} options={{ headerShown: false }} />
+        <Stack.Screen name="MenuListrik" component={MenuListrik} options={{ headerShown: false }} />
+        <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="LaporanTagihan" component={LaporanTagihan} options={{ headerShown: false }} />
+        <Stack.Screen name="InputNoMeter" component={InputNoMeter} options={{ headerShown: false }} />
+        <Stack.Screen name="TambahTagihan" component={TambahTagihan} options={{ headerShown: false }} />
+        <Stack.Screen name="UbahProfile" component={UbahProfile} options={{ headerShown: false }} />
+        <Stack.Screen name="UbahPass" component={UbahPassword} options={{ headerShown: false }} />
+        <Stack.Screen name="Pengaduan" component={Pengaduan} options={{ headerShown: false }} />
+        <Stack.Screen name="PusatBantuan" component={PusatBantuan} options={{ headerShown: false }} />
+        <Stack.Screen name="TentangAplikasi" component={TentangAplikasi} options={{ headerShown: false }} />
+      </Stack.Navigator>
+    // </NavigationContainer>
   )
 }
 
